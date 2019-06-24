@@ -36,7 +36,7 @@
     z-index: 0;
   }
 
-  i {
+  .footer i, .nav i, .btn-round i {
     font-size: 30px;
     color: rgb(216, 216, 216);
   }
@@ -54,7 +54,8 @@
   }
 
   .brand {
-    padding-top: 1rem;
+    padding-top: auto;
+    padding-bottom: auto;
     padding-left: 5.5rem;
     font-size: 30px;
   }
@@ -72,6 +73,12 @@
     height: 53px;
     width: 53px; 
     border-radius: 50%;
+  }
+
+  .skill-border {
+    border: 1px solid rgb(216, 215, 215) !important;
+    border-radius: 4px;
+    padding: 3px;
   }
 
   .nav {

@@ -97,18 +97,19 @@
                 </li>
             </ul>
         </nav>
+
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="#">Job Portal</a></h2>
             
-            <?php
-                if($loggedin == true) {
-                    echo '
-                        <div class="btn-group dropleft align-self-end p-2 ml-auto">
-                            <!--Profile Link-->
-                            <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-user-circle"></i>
-                            </button>
+            <div class="btn-group dropleft align-self-end p-2 ml-auto">
+                <!--Profile Link-->
+                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <?php
+                    if($loggedin == true) {
+                        echo '
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
@@ -117,10 +118,16 @@
                                 <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>                    
                                 <a class="dropdown-item" href="logout.php">Logout</a>
                             </div>
+                        ';
+                    } else {
+                        echo '
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#login">Login</a>
                         </div>
-                    ';
-                }
-            ?>
+                        ';
+                    }
+                ?>
+            </div>
         </div>
           
         <!--Page Content-->
@@ -186,30 +193,20 @@
                                         <!--Carousel Content Code-->
                                         <div class="row">
                                             <div class="col-4 offset-1">                                		
-                                                <img src="https://picsum.photos/700/600?random=1" class="d-block w-100" >
+                                                <img src="https://picsum.photos/id/1/700/600" class="d-block w-100" >
                                             </div>
                                             <div class="col-4 offset-2">                                		
-                                                <img src="https://picsum.photos/700/600?random=2" class="d-block w-100" >
+                                                <img src="https://picsum.photos/id/2/700/600" class="d-block w-100" >
                                             </div>
                                         </div>
                                     </div>
                                     <div class="carousel-item" data-interval="2000">
                                         <div class="row">
                                             <div class="col-4 offset-1">                                		
-                                                <img src="https://picsum.photos/700/600?random=3" class="d-block w-100" >
+                                                <img src="https://picsum.photos/id/3/700/600" class="d-block w-100" >
                                             </div>
                                             <div class="col-4 offset-2">                                		
-                                                <img src="https://picsum.photos/700/600?random=4" class="d-block w-100" >
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="carousel-item" data-interval="2000">
-                                        <div class="row">
-                                            <div class="col-4 offset-1">                                		
-                                                <img src="https://picsum.photos/700/600?random=5" class="d-block w-100" >
-                                            </div>
-                                            <div class="col-4 offset-2">                                		
-                                                <img src="https://picsum.photos/700/600?random=6" class="d-block w-100" >
+                                                <img src="https://picsum.photos/id/4/700/600" class="d-block w-100" >
                                             </div>
                                         </div>
                                     </div>
@@ -351,9 +348,8 @@
         </div>
 
         <!-- Profile Modal -->
-        <!-- Button trigger modal -->
         <div class="modal fade" id="profile">
-            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title" id="exampleModalLabel">Your Profile</h5>
@@ -362,27 +358,50 @@
                         </button>
                     </div>
                 <div class="modal-body container">
-                    <h4>Name</h4>
-                    <p>Aritra Mukherjee</p>
-                    <h4>Phone</h4>
-                    <p>9674303832</p>
-                    <h4>Email</h4>
-                    <p>aritramukherjee100@gmail.com</p>
-                    <h4>Address</h4>
-                    <p>Jadavpur, Kolkata, India</p>
-                    <h4>Fresher</h4>
-                    <p>No</p>
-                    <h4>Present Company</h4>
-                    <p>Microsoft</p>
-                    <h4>Designation</h4>
-                    <p>AI Engineer</p>
-                    <h4>Salary</h4>
-                    <p>$8000</p>
-                    <h4>Experience</h4>
-                    <p>3 Years</p>
+                    <?php
+                        $sql = "SELECT name, email, phone, address, fresher, present_company, designation, salary, experience, cv FROM jobseeker WHERE id = '".$_SESSION["id"]."'";
+                        $statement = $con->prepare($sql);
+                        $statement->execute();
+                        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+                        $mFresher = $row['fresher'] == 'true' ? 'Yes' : 'No';
+                        $mPresentCompany = $row['present_company'] == '' ? 'None' : $row['present_company'];
+                        $mDesignation = $row['designation'] == '' ? 'None' : $row['designation'];
+                        $mSalary = $row['salary'] == '' ? 'None' : $row['salary'];
+                        $mExperience = $row['experience'] == '' ? 'None' : $row['eperience'];
+                        $mFile = $row['cv'] == '' ? 'none' : $row['cv'];
+
+                        echo '
+                            <h5><i class="fas fa-user"></i> Name</h5>
+                            <p>'.$row['name'].'</p>
+                            <h5><i class="fas fa-phone"></i> Phone</h5>
+                            <p>'.$row['phone'].'</p>
+                            <h5><i class="fas fa-envelope"></i> Email</h5>
+                            <p>'.$row['email'].'</p>
+                            <h5><i class="fas fa-map-marked-alt"></i> Address</h5>
+                            <p>'.$row['address'].'</p>
+                            <h5><i class="fas fa-briefcase"></i> Fresher</h5>
+                            <p>'.$mFresher.'</p>
+                            <h5><i class="fas fa-building"></i> Present Company</h5>
+                            <p>'.$mPresentCompany.'</p>
+                            <h5><i class="fas fa-user-tag"></i> Designation</h5>
+                            <p>'.$mDesignation.'</p>
+                            <h5><i class="fas fa-money-check-alt"></i> Salary</h5>
+                            <p>'.$mSalary.'</p>
+                            <h5><i class="fas fa-chart-line"></i> Experience</h5>
+                            <p>'.$mExperience.'</p>
+                            <h5><i class="far fa-file-alt"></i> CV</h5>
+                        ';
+
+                        if($mFile == 'none') {
+                            echo '<p>None. Upload from Edit Profile page.</p>';
+                        } else {
+                            echo '<a class="text-dark" href="'.$mFile.'">View File</a>';
+                        }
+                    ?>
                 </div>
                 <div class="modal-footer">
-                    <a href="jobseeker/edit-profile.html" class="btn btn-secondary">Edit</a>
+                    <a href="jobseeker/edit-profile.php" class="btn btn-secondary">Edit</a>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
                 </div>

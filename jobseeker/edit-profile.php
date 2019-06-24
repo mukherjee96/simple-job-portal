@@ -10,6 +10,8 @@
     } else {
         header("location:../");
     }
+
+    $fileOk = array('valid' => true, 'error' => '');
     
     // Obtain Personal Details & Experience
     $sql = "SELECT name,email,phone,address,fresher,present_company,designation,salary,experience FROM jobseeker WHERE id = '".$_SESSION["id"]."';";
@@ -34,7 +36,13 @@
     $statement->execute();
     $ug = $statement->fetch(PDO::FETCH_ASSOC);
 
-    if(isset($_POST["updatebtn"])){
+    // Obtain Skills
+    $sql = "SELECT skill FROM jsskills WHERE jsid = '".$_SESSION["id"]."'";
+    $statement = $con->prepare($sql);
+    $statement->execute();
+    $skills = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    if(isset($_POST["name"])) {
         // Personal details
         $name = $_POST['name'];
         $email = $_POST['email'];
@@ -67,6 +75,9 @@
             $experience = $_POST['experience'];
         }
 
+        // Skills
+        $skills = json_decode($_POST["skills"]);
+
         // Update personal details
         $con->beginTransaction();
         $sql = "UPDATE jobseeker SET name='".$name."', email='".$email."', address='".$address."', phone='".$phone."';";
@@ -83,21 +94,67 @@
 
         // Update secondary education
         $con->beginTransaction();
-        $sql = "UPDATE jstenth SET jsid='".$_SESSION["id"]."', board='".$sboard."', yop='".$syop."', marks='".$smarks." WHERE jsid = '".$_SESSION['id']."';";
+        $sql = "UPDATE jstenth SET board='".$sboard."', yop='".$syop."', marks='".$smarks."' WHERE jsid = '".$_SESSION['id']."';";
         $response = $con->exec($sql);
         $con->commit();
 
         // Update higher secondary education
         $con->beginTransaction();
-        $sql = "UPDATE jstwelveth SET jsid='".$_SESSION["id"]."', board='".$hsboard."', stream='".$stream."', yop='".$hsyop."', marks='".$hsmarks." WHERE jsid = '".$_SESSION['id']."';";
+        $sql = "UPDATE jstwelveth SET board='".$hsboard."', stream='".$stream."', yop='".$hsyop."', marks='".$hsmarks."' WHERE jsid = '".$_SESSION['id']."';";
         $response = $con->exec($sql);
         $con->commit();
 
         // Update undergraduation details
         $con->beginTransaction();
-        $sql = "UPDATE jsug SET jsid='".$_SESSION["id"]."', university='".$university."', dept='".$department."', yop='".$ugyop."', marks='".$ugmarks." WHERE jsid = '".$_SESSION['id']."';";
+        $sql = "UPDATE jsug SET university='".$university."', dept='".$department."', yop='".$ugyop."', marks='".$ugmarks."' WHERE jsid = '".$_SESSION['id']."';";
         $response = $con->exec($sql);
         $con->commit();
+
+        // Update skills
+        $con->beginTransaction();
+        $sql = "DELETE from jsskills WHERE jsid = '".$_SESSION["id"]."';";
+        foreach ($skills as $skill) {
+            $sql .= "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', '".$skill."');";
+        }
+        $response = $con->exec($sql);
+        $con->commit();
+
+        // CV upload
+        if(isset($_FILES["cv"]) && $_FILES["cv"]["name"] != "") {
+            $target_dir = "../uploads/";
+            $fileType = strtolower(pathinfo($target_dir . basename($_FILES["cv"]["name"]),PATHINFO_EXTENSION));
+            $target_file = $target_dir . $_SESSION["id"] . "." . $fileType;
+            
+            // Check if file already exists
+            // if (file_exists($target_file)) {
+            //     $fileOk['valid'] = false;
+            //     $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is already present.';
+            // }
+
+            // Check file size
+            if ($_FILES["cv"]["size"] > 500000) {
+                $fileOk['valid'] = false;
+                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is too large.';
+            }
+
+            // Allow certain file formats
+            if($fileType != "pdf" && $fileType != "doc" && $fileType != "docx") {
+                $fileOk['valid'] = false;
+                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is of an invalid extension. Allowed formats: PDF, DOC, DOCX.';
+            }
+
+            if ($fileOk['valid'] == true) {
+                if (move_uploaded_file($_FILES["cv"]["tmp_name"], $target_file)) {
+                    $con->beginTransaction();
+                    $sql = "UPDATE jobseeker SET cv ='".substr($target_file, 3)."' WHERE id = '".$_SESSION["id"]."';";
+                    $reponse = $con->exec($sql);
+                    $con->commit();
+                } else {
+                    echo "<script>window.location.href='edit-profile.php?error=true'</script>";
+                }
+            }
+        }
+        echo "<script>window.location.href='edit-profile.php?success=true'</script>";
     }
 
     if(isset($_POST["deletebtn"])){
@@ -135,10 +192,11 @@
          <nav class="nav">
             <ul>
                 <!--After Login-->
+                <li><a href="../">Home</a></li>
                 <?php
                     if($loggedin == true) {
                         echo '                 
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="../logout.php">Logout</a></li>
                         ';
                     }
                 ?>
@@ -154,7 +212,7 @@
         </nav>
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
-            <h2 class="brand"><a href="#">Job Portal</a></h2>
+            <h2 class="brand"><a href="../">Job Portal</a></h2>
             
             <?php
                 if($loggedin == true) {
@@ -177,12 +235,14 @@
         </div>
 
         <div class="page-container">
+            <div class="alert alert-danger" role="alert" id="error" style="display: none;"></div>
+            <div class="alert alert-success" role="alert" id="success" style="display: none;"></div>
             <div class="content-wrap container">
                 <div class="text-center">
                     <h2>Edit Your Profile</h2>
                 </div>
 
-                <form action="#" method="POST" enctype="multipart/form-data">
+                <form action="#" method="POST" enctype="multipart/form-data" id="profileEditForm">
 
                     <h4 class="mt-5">Personal Details</h4><hr><br>
                     <div class="form-row">
@@ -221,9 +281,9 @@
                             ?>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="website">Upload CV</label>
+                            <label for="cv">Upload CV</label>                    
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="customFile">
+                                <input type="file" class="custom-file-input" id="cv" name="cv">
                                 <label class="custom-file-label" for="customFile">Choose file</label>
                             </div>
                         </div>
@@ -374,9 +434,33 @@
                         </div>
                     </div>
 
+                    <h4 class="mt-4">Skills</h4><hr><br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Add a skill" id="skill-input">
+                                <div class="input-group-append">
+                                    <button class="btn btn-outline-secondary" type="button" id="skill-add">Add</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 mt-2">
+                            <div class="d-flex flex-wrap skill-border" id="skill-container">
+                                <?php
+                                    foreach ($skills as $skill) {
+                                        echo '
+                                            <div class="p-1"><a class="btn btn-sm btn-dark" href="#" role="button">'.$skill['skill'].'</a></div>
+                                        ';
+                                    }
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center"><small class="text-muted">Click on a skill to remove</small></div>
+
                     <div class="row justify-content-center text-center mt-5">
                         <div class="col-4">
-                            <button type="submit" name="updatebtn" class="btn btn-block btn-secondary mb-3">Update Profile</button>
+                            <button type="submit" name="updatebtn" class="btn btn-block btn-secondary mb-3" id="updatebtn">Update Profile</button>
                             <a href="#" class="text-danger" data-toggle="modal" data-target="#delete-profile">Delete Profile</a>
                         </div>
                     </div>
@@ -421,6 +505,58 @@
     <!-- Optional JavaScript -->
     <script src="../js/app.js"></script>
     <script>
+        const skillAddBtn = document.getElementById('skill-add');
+        const skillInput = document.getElementById('skill-input');
+        const skillContainer = document.getElementById('skill-container');
+        const form = document.getElementById('profileEditForm');
+        const updateBtn = document.getElementById('updatebtn');
+
+        const addSkill = function(e) {
+            if(skillInput.value !== '') {
+                const div = document.createElement('div');
+                div.classList.add('p-1');
+                div.innerHTML = `<a class="btn btn-sm btn-dark" href="#" role="button">${skillInput.value}</a>`;
+                skillContainer.appendChild(div);
+                skillInput.value = '';
+            }
+        }
+
+        skillAddBtn.addEventListener('click', addSkill);
+        document.addEventListener('keydown', function(e) {
+            if(e.keyCode === 13) {
+                e.preventDefault();
+                addSkill();
+            }
+        })
+
+        updateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const skillContainerNodes = skillContainer.children;
+            const skills = [];
+            for(let element of skillContainerNodes) {
+                skills.push(element.childNodes[0].innerHTML);
+            }
+            const hInput = document.createElement('input');
+            hInput.type = 'hidden';
+            hInput.name = 'skills';
+            hInput.value = JSON.stringify(skills);
+            form.appendChild(hInput);
+            form.submit();
+        });
+
+        skillContainer.addEventListener('click', function(e) {
+            e.preventDefault();
+            if(e.target.classList.contains('btn')) {
+                e.target.parentNode.remove();
+            }
+        });
+
+        // Initialize BSCustomFileInput plugin for showing File Input name
+        window.addEventListener('DOMContentLoaded', (event) => {
+            bsCustomFileInput.init();
+        });
+    </script>
+    <script>
         const checkbox = document.getElementById('fresher');
         checkbox.addEventListener('click', function(e) {
             if(checkbox.checked === true) {
@@ -438,13 +574,37 @@
         });
 
         <?php
-            if($checked)
+            if($checked == "true") {
                 echo "document.getElementById('fresher').click()";
+            }
+            
+            if($fileOk['valid'] == false) {
+                echo "
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').innerHTML = '".$fileOk["error"]."';
+                ";
+            }
+
+            if(isset($_REQUEST['error'])) {
+                echo "
+                    document.getElementById('error').style.display = 'block';
+                    document.getElementById('error').innerHTML = 'Your profile has been updated but the server faced an internal error and your CV was not uploaded. Try again.';
+                ";
+            }
+
+            if(isset($_REQUEST['success'])) {
+                echo "
+                    document.getElementById('success').style.display = 'block';
+                    document.getElementById('success').innerHTML = 'Your profile has been updated successfully.';
+                ";
+            }
         ?>
     </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.js
+"></script>
   </body>
 </html>

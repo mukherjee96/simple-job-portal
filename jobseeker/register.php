@@ -14,7 +14,7 @@
                 
                 $pass = password_hash($pass, PASSWORD_DEFAULT);
                 $con->beginTransaction();
-                $sql = "INSERT INTO jobseeker(name, email, password) VALUES ('$name', '$email', '$pass');";
+                $sql = "INSERT INTO jobseeker(name, email, password, verified) VALUES ('$name', '$email', '$pass', 'false');";
                 $response = $con->exec($sql);
                 $con->commit();
 
@@ -76,14 +76,7 @@
         <nav class="nav">
             <ul>
             	<!--Before Login-->
-                <li><a href="#" data-toggle="modal" data-target="#login">Login</a></li>
-                <li><a href="#" data-toggle="modal" data-target="#register">Register</a></li>
-
-                <!--After Login-->
-                <li><a href="#">Profile</a></li>
-                <li><a href="#">Edit</a></li>                    
-                <li><a href="#">Logout</a></li>
-
+                <li><a href="../">Home</a></li>
                 <li><a href="#">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start bd-highlight mt-3">
@@ -94,9 +87,20 @@
                 </li>
             </ul>
         </nav>
+        
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
+            
+            <div class="btn-group dropleft align-self-end p-2 ml-auto">
+                <!--Profile Link-->
+                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-circle"></i>
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="../">Login</a>
+                </div>
+            </div>
         </div>
 
         <div class="page-container">
