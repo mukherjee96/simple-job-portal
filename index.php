@@ -80,7 +80,7 @@
                     if($loggedin == true) {
                         echo '
                             <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
-                            <li><a href="jobseeker/edit-profile.html">Edit</a></li>                    
+                            <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
                             <li><a href="logout.php">Logout</a></li>
                         ';
                     }
@@ -114,7 +114,7 @@
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#profile">Profile</a>
-                                <a class="dropdown-item" href="jobseeker/edit-profile.html">Edit</a>                    
+                                <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>                    
                                 <a class="dropdown-item" href="logout.php">Logout</a>
                             </div>
                         </div>

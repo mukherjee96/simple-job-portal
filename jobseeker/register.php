@@ -18,6 +18,26 @@
                 $response = $con->exec($sql);
                 $con->commit();
 
+                $sql = "SELECT id FROM jobseeker WHERE email = '".$email."';";
+                $statement = $con->prepare($sql);
+                $statement->execute();
+                $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+                $con->beginTransaction();
+                $sql = "INSERT INTO jstenth(jsid) VALUES ('".$result["id"]."');";
+                $response = $con->exec($sql);
+                $con->commit();
+
+                $con->beginTransaction();
+                $sql = "INSERT INTO jstwelveth(jsid) VALUES ('".$result["id"]."');";
+                $response = $con->exec($sql);
+                $con->commit();
+
+                $con->beginTransaction();
+                $sql = "INSERT INTO jsug(jsid) VALUES ('".$result["id"]."');";
+                $response = $con->exec($sql);
+                $con->commit();
+
                 if($response) {
                     echo "<script>window.location.href='../index.php?account_created=true'</script>";
                 } else {
