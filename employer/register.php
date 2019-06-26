@@ -205,7 +205,7 @@
         </div>
 
     <!-- Optional JavaScript -->
-    <script src="../js/app.js"></script>
+    <script src="../js/nav.js"></script>
     <script>
         const pass = document.getElementById('password');
         const cpass = document.getElementById('cpassword');

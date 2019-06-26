@@ -1,3 +1,21 @@
+<?php
+    require "../connect.php";
+    session_start();
+    if(isset($_POST['loginbtn'])){
+        $statement = $con->prepare("SELECT email,password FROM admin");
+        $statement->execute();
+        $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+        if($_POST['email'] == $result['email'] && $_POST['password'] == $result['password']){
+            $_SESSION['admin'] = true;
+            header('location:index.php');
+        }
+        else{
+            header('location:login.php?error=true');
+        }
+    }
+?>
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -22,7 +40,7 @@
                     <i class="fas fa-user-circle h1"></i>
                 </div>
                 <h3 class="text-center pb-3">Please sign in</h3>
-                <form action="#" method="POST">
+                <form action="login.php" method="POST">
                     <div class="form-group">
                         <label for="email">Email address</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
@@ -33,11 +51,21 @@
                     </div>
                     <div class="row justify-content-center pt-3">
                         <div class="col-5">
-                            <button type="submit" class="btn btn-block btn-dark">Submit</button>
+                            <button type="submit" name="loginbtn" class="btn btn-block btn-dark">Submit</button>
                         </div>
                     </div>
                 </form>
             </div>
+        <?php 
+        if(isset($_REQUEST['error']))
+        echo '
+        <div class="container">
+            <div class="alert alert-danger" role="alert" id="error">
+                <p>Invalid email or password. Please try again.</p>
+            </div>
+        </div>
+        ';
+        ?>
         </div>
     </div>
 

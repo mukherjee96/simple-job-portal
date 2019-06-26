@@ -2,5 +2,6 @@
 	session_start();
 	session_unset();
 	session_destroy();
-	echo "<script>window.location.href='index.php?loggedout=true'</script>";
+	header("Location: index.php?loggedout=true");
+	die();
 ?>

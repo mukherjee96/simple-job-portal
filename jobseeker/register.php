@@ -1,50 +1,66 @@
 <?php
+    header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
+
     require '../connect.php';
     session_start();
+
     if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] == true) {
-        echo "<script>window.location.href='../'</script>";
+        header("Location: ../");
     } else {
         if(isset($_POST['name'])) {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $pass = $_POST['password'];
-            $cpass = $_POST['cpassword'];
+            $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+            $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
-            if($pass == $cpass) {
+            $sql = "SELECT email FROM jobseeker WHERE email = :email";
+            $statement = $con->prepare($sql);
+            $statement->bindParam(':email', $email);
+            $statement->execute();
+
+            if(!$statement->rowCount() && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                $pass = $_POST['password'];
+                $cpass = $_POST['cpassword'];
                 
-                $pass = password_hash($pass, PASSWORD_DEFAULT);
-                $con->beginTransaction();
-                $sql = "INSERT INTO jobseeker(name, email, password, verified) VALUES ('$name', '$email', '$pass', 'false');";
-                $response = $con->exec($sql);
-                $con->commit();
+                if($pass == $cpass) {
 
-                $sql = "SELECT id FROM jobseeker WHERE email = '".$email."';";
-                $statement = $con->prepare($sql);
-                $statement->execute();
-                $result = $statement->fetch(PDO::FETCH_ASSOC);
+                    $error = false;
 
-                $con->beginTransaction();
-                $sql = "INSERT INTO jstenth(jsid) VALUES ('".$result["id"]."');";
-                $response = $con->exec($sql);
-                $con->commit();
+                    $pass = password_hash($pass, PASSWORD_DEFAULT);
+                    $id = md5(time() . $email);
 
-                $con->beginTransaction();
-                $sql = "INSERT INTO jstwelveth(jsid) VALUES ('".$result["id"]."');";
-                $response = $con->exec($sql);
-                $con->commit();
+                    $sql = "INSERT INTO jobseeker(id, name, email, password, verified) VALUES ('$id', '$name', '$email', '$pass', 'false');";
+                    $statement = $con->prepare($sql);
+                    $statement->execute();
+                    if(!$statement->rowCount())
+                        $error = true;
+    
+                    $sql = "INSERT INTO jstenth(jsid) VALUES ('$id');";
+                    $statement = $con->prepare($sql);
+                    $statement->execute();
+                    if(!$statement->rowCount())
+                        $error = true;
 
-                $con->beginTransaction();
-                $sql = "INSERT INTO jsug(jsid) VALUES ('".$result["id"]."');";
-                $response = $con->exec($sql);
-                $con->commit();
-
-                if($response) {
-                    echo "<script>window.location.href='../index.php?account_created=true'</script>";
+                    $sql = "INSERT INTO jstwelveth(jsid) VALUES ('$id');";
+                    $statement = $con->prepare($sql);
+                    $statement->execute();
+                    if(!$statement->rowCount())
+                        $error = true;
+    
+                    $sql = "INSERT INTO jsug(jsid) VALUES ('$id');";
+                    $statement = $con->prepare($sql);
+                    $statement->execute();
+                    if(!$statement->rowCount())
+                        $error = true;
+    
+                    if(!$error) {
+                        header("Location: ../index.php?account_created=true");
+                    } else {
+                        header("Location: register.php?error=true");
+                    }
                 } else {
-                    $error = true;
+                    header("Location: register.php?alert=true");
                 }
             } else {
-                $alert = true;
+                header("Location: register.php?error=true");
             }
         }
     }
@@ -109,38 +125,46 @@
                     <h2>Register as Job Seeker</h2>
                 </div>
                 
-                <form action="#" method="POST" id="form">
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="name">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+                <div class="mb-3">
+                    <form action="#" method="POST" id="form">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="name">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" placeholder="Name">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="email">Email</label>
+                                <input type="Email" class="form-control" id="email" name="email" placeholder="Email">
+                            </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="email">Email</label>
-                            <input type="Email" class="form-control" id="email" name="email" placeholder="Email">
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="password">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="cpassword">Confirm Password</label>
+                                <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm Password">
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        <div class="row justify-content-center mt-4">
+                            <div class="col-4">
+                                <button type="submit" class="btn btn-block btn-secondary">Register</button>
+                            </div>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="cpassword">Confirm Password</label>
-                            <input type="password" class="form-control" id="cpassword" name="cpassword" placeholder="Confirm Password">
-                        </div>
-                    </div>
-                    <div class="row justify-content-center mt-4">
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-block btn-secondary">Register</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="alert alert-danger fade mt-5" role="alert" id="alert">
+                    </form>
+                </div>
+                <div class="alert alert-danger" role="alert" id="alert" style="display:none;">
                     Passwords do not match!
                 </div>
-                <div class="alert alert-danger mt-5" role="alert" id="errorAlert" style="display:none;">
-                    Something went wrong. Try again.
+                <div class="alert alert-danger" role="alert" id="error" style="display:none;">
+                    <h4 class="alert-heading">Something went wrong. Try again.</h4>
+                    <p>Probable causes:</p>
+                    <ul>
+                        <li>Account already exists.</li>
+                        <li>Passwords do not match.</li>
+                        <li>Invalid email.</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -159,38 +183,13 @@
         </div>
 
     <!-- Optional JavaScript -->
-    <script src="../js/app.js"></script>
-    <script>
-        const pass = document.getElementById('password');
-        const cpass = document.getElementById('cpassword');
-        const form = document.getElementById('form');
-        const alert = document.getElementById('alert');
-        const errorAlert = document.getElementById('errorAlert');
-
-        cpass.addEventListener('keyup', function(e) {
-            if(pass.value !== cpass.value) {
-                cpass.classList.add('is-invalid');
-                pass.classList.add('is-invalid');
-            } else {
-                cpass.classList.remove('is-invalid');
-                pass.classList.remove('is-invalid');
-            }
-        });
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            if(pass.value !== cpass.value) {
-                alert.classList.add("show");
-                return false;
-            } else {
-                form.submit();
-            }
-        });
-    </script>
+    <script src="../js/nav.js"></script>
+    <script src="js/register.js"></script>
     <?php
-        if($alert == true) {
-            echo '<script>alert.classList.add("show");</script>';
-        } else if($error == true) {
-            echo '<script>errorAlert.classList.add("show");</script>';
+        if(isset($_REQUEST["alert"])) {
+            echo '<script src="../js/alert.js"></script>';
+        } else if(isset($_REQUEST["error"])) {
+            echo '<script src="../js/error.js"></script>';
         }
     ?>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

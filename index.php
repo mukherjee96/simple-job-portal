@@ -1,4 +1,6 @@
 <?php
+    header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
+    
     require "connect.php";
     session_start();
     $loggedin = false;
@@ -35,9 +37,9 @@
                 $_SESSION["name"] = $result["rname"];
             $_SESSION["email"] = $email;
             $_SESSION["email"] = $email;
-            echo "<script>window.location.href='index.php'</script>";
+            header("Location: index.php");
         } else {
-            echo "<script>window.location.href='index.php?error=true'</script>";
+            header("Location: index.php?error=true");
         }
     }
 ?>
@@ -316,8 +318,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-secondary" id="loginbtn" name="loginbtn">Login</button>
+                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-outline-dark" id="loginbtn" name="loginbtn">Login</button>
                     </div>
                 </form>
               </div>
@@ -341,7 +343,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
@@ -368,41 +370,41 @@
                         $mPresentCompany = $row['present_company'] == '' ? 'None' : $row['present_company'];
                         $mDesignation = $row['designation'] == '' ? 'None' : $row['designation'];
                         $mSalary = $row['salary'] == '' ? 'None' : $row['salary'];
-                        $mExperience = $row['experience'] == '' ? 'None' : $row['eperience'];
+                        $mExperience = $row['experience'] == '' ? 'None' : $row['experience'];
                         $mFile = $row['cv'] == '' ? 'none' : $row['cv'];
 
                         echo '
-                            <h5><i class="fas fa-user"></i> Name</h5>
-                            <p>'.$row['name'].'</p>
-                            <h5><i class="fas fa-phone"></i> Phone</h5>
-                            <p>'.$row['phone'].'</p>
-                            <h5><i class="fas fa-envelope"></i> Email</h5>
-                            <p>'.$row['email'].'</p>
-                            <h5><i class="fas fa-map-marked-alt"></i> Address</h5>
-                            <p>'.$row['address'].'</p>
-                            <h5><i class="fas fa-briefcase"></i> Fresher</h5>
-                            <p>'.$mFresher.'</p>
-                            <h5><i class="fas fa-building"></i> Present Company</h5>
-                            <p>'.$mPresentCompany.'</p>
-                            <h5><i class="fas fa-user-tag"></i> Designation</h5>
-                            <p>'.$mDesignation.'</p>
-                            <h5><i class="fas fa-money-check-alt"></i> Salary</h5>
-                            <p>'.$mSalary.'</p>
-                            <h5><i class="fas fa-chart-line"></i> Experience</h5>
-                            <p>'.$mExperience.'</p>
-                            <h5><i class="far fa-file-alt"></i> CV</h5>
+                            
+                            <p><b><i class="fas fa-user"></i> Name: </b>'.$row['name'].'</p>
+                            
+                            <p><b><i class="fas fa-phone"></i> Phone: </b>'.$row['phone'].'</p>
+                            
+                            <p><b><i class="fas fa-envelope"></i> Email: </b>'.$row['email'].'</p>
+                            
+                            <p><b><i class="fas fa-map-marked-alt"></i> Address: </b>'.$row['address'].'</p>
+                            
+                            <p><b><i class="fas fa-briefcase"></i> Fresher: </b>'.$mFresher.'</p>
+                            
+                            <p><b><i class="fas fa-building"></i> Present Company: </b>'.$mPresentCompany.'</p>
+                            
+                            <p><b><i class="fas fa-user-tag"></i> Designation: </b>'.$mDesignation.'</p>
+                            
+                            <p><b><i class="fas fa-money-check-alt"></i> Salary: &#8377;</b>'.$mSalary.'</p>
+                            
+                            <p><b><i class="fas fa-chart-line"></i> Experience: </b>'.$mExperience.' Years</p>
+                            
                         ';
 
                         if($mFile == 'none') {
-                            echo '<p>None. Upload from Edit Profile page.</p>';
+                            echo '<p><b><i class="far fa-file-alt"></i> CV: </b>None. Upload from Edit Profile page.</p>';
                         } else {
-                            echo '<a class="text-dark" href="'.$mFile.'">View File</a>';
+                            echo '<b><i class="far fa-file-alt"></i> CV: </b><a class="text-dark" href="uploads/cv/'.$mFile.'">View File</a>';
                         }
                     ?>
                 </div>
                 <div class="modal-footer">
-                    <a href="jobseeker/edit-profile.php" class="btn btn-secondary">Edit</a>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <a href="jobseeker/edit-profile.php" class="btn btn-outline-dark">Edit</a>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
@@ -423,32 +425,24 @@
         </div>
         
         <!-- Optional JavaScript -->
-        <script src="js/app.js"></script>
-        <script>
-            const success = document.getElementById('success');
-            const errorAlert = document.getElementById('error');
-            const loggedout = document.getElementById('loggedout');
-            <?php
-                if(isset($_REQUEST["account_created"])) {
-                    if($_REQUEST["account_created"] == true) {
-                        echo "success.style.display = 'block';
-                            setTimeout(() => {success.style.display = 'none'}, 4000);";
-                    }
+        <script src="js/nav.js"></script>
+        <?php
+            if(isset($_REQUEST["account_created"])) {
+                if($_REQUEST["account_created"] == true) {
+                    echo "<script src='js/success.js'></script>";
                 }
-                if(isset($_REQUEST["error"])) {
-                    if($_REQUEST["error"] == true) {
-                        echo "errorAlert.style.display = 'block';
-                            setTimeout(() => {errorAlert.style.display = 'none'}, 3000);";
-                    }
+            }
+            if(isset($_REQUEST["error"])) {
+                if($_REQUEST["error"] == true) {
+                     echo "<script src='js/error.js'></script>";
                 }
-                if(isset($_REQUEST["loggedout"])) {
-                    if($_REQUEST["loggedout"] == true) {
-                        echo "loggedout.style.display = 'block';
-                        setTimeout(() => {loggedout.style.display = 'none'}, 3000);";
-                    }
+            }
+            if(isset($_REQUEST["loggedout"])) {
+                if($_REQUEST["loggedout"] == true) {
+                    echo "<script src='js/logout.js'></script>";
                 }
-            ?>
-        </script>
+            }
+        ?>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

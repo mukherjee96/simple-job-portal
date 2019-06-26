@@ -120,25 +120,33 @@
         $con->commit();
 
         // CV upload
-        if(isset($_FILES["cv"]) && $_FILES["cv"]["name"] != "") {
-            $target_dir = "../uploads/";
-            $fileType = strtolower(pathinfo($target_dir . basename($_FILES["cv"]["name"]),PATHINFO_EXTENSION));
-            $target_file = $target_dir . $_SESSION["id"] . "." . $fileType;
-            
-            // Check if file already exists
-            // if (file_exists($target_file)) {
-            //     $fileOk['valid'] = false;
-            //     $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is already present.';
-            // }
+        if(isset($_FILES["cv"]) && $_FILES['cv']['error'] == UPLOAD_ERR_OK) {
+
+            $target_dir = "../uploads/cv/";
+
+            $fileName = $_FILES['cv']['name'];
+            $fileNameExploded = explode(".", $fileName);
+            $fileExtension = strtolower(end($fileNameExploded));
+            $newFileName = md5(time() . $fileName) . "." . $fileExtension;
+            $target_file = $target_dir . $newFileName;
+
+            // Delete old file if exists
+            $sql = "SELECT cv FROM jobseeker WHERE id = '".$_SESSION["id"]."';";
+            $statement = $con->prepare($sql);
+            $statement->execute();
+            $oldFile = $statement->fetch(PDO::FETCH_ASSOC);
+            if($oldFile["cv"] != "") {
+                unlink("../uploads/cv/" . $oldFile["cv"]);
+            }
 
             // Check file size
-            if ($_FILES["cv"]["size"] > 500000) {
+            if ($_FILES["cv"]["size"] > 10000000) {
                 $fileOk['valid'] = false;
-                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is too large.';
+                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is greater than 10MB.';
             }
 
             // Allow certain file formats
-            if($fileType != "pdf" && $fileType != "doc" && $fileType != "docx") {
+            if($fileExtension != "pdf" && $fileExtension != "doc" && $fileExtension != "docx") {
                 $fileOk['valid'] = false;
                 $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is of an invalid extension. Allowed formats: PDF, DOC, DOCX.';
             }
@@ -146,15 +154,17 @@
             if ($fileOk['valid'] == true) {
                 if (move_uploaded_file($_FILES["cv"]["tmp_name"], $target_file)) {
                     $con->beginTransaction();
-                    $sql = "UPDATE jobseeker SET cv ='".substr($target_file, 3)."' WHERE id = '".$_SESSION["id"]."';";
+                    $sql = "UPDATE jobseeker SET cv ='".$newFileName."' WHERE id = '".$_SESSION["id"]."';";
                     $reponse = $con->exec($sql);
                     $con->commit();
                 } else {
-                    echo "<script>window.location.href='edit-profile.php?error=true'</script>";
+                    header("Location: edit-profile.php?error=true");
+                    // echo "<script>window.location.href='edit-profile.php?error=true'</script>";
                 }
             }
         }
-        echo "<script>window.location.href='edit-profile.php?success=true'</script>";
+        header("Location: edit-profile.php?success=true");
+        // echo "<script>window.location.href='edit-profile.php?success=true'</script>";
     }
 
     if(isset($_POST["deletebtn"])){
@@ -503,7 +513,7 @@
         </div>
 
     <!-- Optional JavaScript -->
-    <script src="../js/app.js"></script>
+    <script src="../js/nav.js"></script>
     <script>
         const skillAddBtn = document.getElementById('skill-add');
         const skillInput = document.getElementById('skill-input');
