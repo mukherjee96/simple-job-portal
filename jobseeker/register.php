@@ -8,12 +8,12 @@
         header("Location: ../");
     } else {
         if(isset($_POST['name'])) {
-            $name = filter_var($_POST['name'], FILTER_SANITIZE_STRING);
+            $name = filter_var($_POST['name'], FILTER_SANITIZE_ENCODED);
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
             $sql = "SELECT email FROM jobseeker WHERE email = :email";
             $statement = $con->prepare($sql);
-            $statement->bindParam(':email', $email);
+            $statement->bindParam(array(':email'=>$email));
             $statement->execute();
 
             if(!$statement->rowCount() && filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -27,9 +27,9 @@
                     $pass = password_hash($pass, PASSWORD_DEFAULT);
                     $id = md5(time() . $email);
 
-                    $sql = "INSERT INTO jobseeker(id, name, email, password, verified) VALUES ('$id', '$name', '$email', '$pass', 'false');";
+                    $sql = "INSERT INTO jobseeker(id, name, email, password, verified) VALUES ('$id', :name, :email, '$pass', 'false');";
                     $statement = $con->prepare($sql);
-                    $statement->execute();
+                    $statement->execute(array('name'=>$name, 'email'=>$email));
                     if(!$statement->rowCount())
                         $error = true;
     
@@ -57,7 +57,7 @@
                         header("Location: register.php?error=true");
                     }
                 } else {
-                    header("Location: register.php?alert=true");
+                    header("Location: register.php?warning=true");
                 }
             } else {
                 header("Location: register.php?error=true");
@@ -154,7 +154,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="alert alert-danger" role="alert" id="alert" style="display:none;">
+                <div class="alert alert-danger" role="alert" id="warning" style="display:none;">
                     Passwords do not match!
                 </div>
                 <div class="alert alert-danger" role="alert" id="error" style="display:none;">
@@ -186,8 +186,8 @@
     <script src="../js/nav.js"></script>
     <script src="js/register.js"></script>
     <?php
-        if(isset($_REQUEST["alert"])) {
-            echo '<script src="../js/alert.js"></script>';
+        if(isset($_REQUEST["warning"])) {
+            echo '<script src="../js/warning.js"></script>';
         } else if(isset($_REQUEST["error"])) {
             echo '<script src="../js/error.js"></script>';
         }

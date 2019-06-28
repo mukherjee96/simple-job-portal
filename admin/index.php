@@ -235,7 +235,7 @@
       
                            if($row['highlighted'] == 'false') {
                               echo '<td class="text-center">
-                              <a href="index.php?highlight=true&job='.$id.'" class="btn btn-sm btn-secondary">Highlight</a>
+                              <a href="index.php?highlight=true&job='.$row['id'].'" class="btn btn-sm btn-secondary">Highlight</a>
                               </td>';
                            } else {
                               echo '<td class="text-center">

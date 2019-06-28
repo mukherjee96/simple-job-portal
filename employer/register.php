@@ -137,7 +137,7 @@
                         </div>
                         <div class="form-group col-md-4">
                             <label for="formed">Company Formed</label>
-                            <input type="date" class="form-control" id="formed" name="formed" required>
+                            <input type="number" class="form-control" id="formed" name="formed" required>
                         </div>
                         <div class="form-group col-md-4">
                             <label for="no_of_emp">Number of Employees</label>

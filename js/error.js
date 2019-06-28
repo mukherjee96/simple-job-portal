@@ -1,5 +1,5 @@
-const errorAlert = document.getElementById('error');
-errorAlert.style.display = 'block';
+const error = document.getElementById('error');
+error.style.display = 'block';
 setTimeout(() => {
-    errorAlert.style.display = 'none';
+    error.style.display = 'none';
 }, 5000);

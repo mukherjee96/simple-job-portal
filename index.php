@@ -8,6 +8,7 @@
     if(isset($_SESSION["loggedin"])) {
         if($_SESSION["loggedin"] == true) {
             $loggedin = true;
+            $userType = $_SESSION["userType"];
         }
     }
 
@@ -17,13 +18,13 @@
         $password = $_POST["password"];
 
         if($type == "jobseeker") {
-            $sql = "SELECT id, name, password FROM jobseeker WHERE email = '$email';";
+            $sql = "SELECT id, name, password FROM jobseeker WHERE email = :email";
         } else if($type == "employer") {
-            $sql = "SELECT id, rname, password FROM employer WHERE remail = '$email';";
+            $sql = "SELECT id, rname, password FROM employer WHERE remail = :email";
         }
 
         $statement = $con->prepare($sql);
-        $statement->execute();
+        $statement->execute(array('email'=>$email));
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         $hash = $result["password"];
 
@@ -31,10 +32,14 @@
             $_SESSION["loggedin"] = true;
             $_SESSION["type"] = $type;
             $_SESSION["id"] = $result["id"];
-            if($type == "jobseeker")
+            if($type == "jobseeker") {
                 $_SESSION["name"] = $result["name"];
-            else
+                $_SESSION["userType"] = "jobseeker";
+            }
+            else {
                 $_SESSION["name"] = $result["rname"];
+                $_SESSION["userType"] = "employer";
+            }
             $_SESSION["email"] = $email;
             $_SESSION["email"] = $email;
             header("Location: index.php");
@@ -80,11 +85,19 @@
                 <!--After Login-->
                 <?php
                     if($loggedin == true) {
-                        echo '
-                            <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
-                            <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
-                            <li><a href="logout.php">Logout</a></li>
-                        ';
+                        if($userType == "jobseeker") {
+                            echo '
+                                <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
+                                <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
+                                <li><a href="logout.php">Logout</a></li>
+                            ';
+                        } else {
+                            echo '
+                                <li><a href="#" data-toggle="modal" data-target="#employer-profile">Profile</a></li>
+                                <li><a href="employer/manage-jobs.php">Post a Job</a></li>
+                                <li><a href="logout.php">Logout</a></li>
+                            ';
+                        }
                     }
                 ?>
 
@@ -111,16 +124,29 @@
                 </button>
                 <?php
                     if($loggedin == true) {
-                        echo '
-                            <div class="dropdown-menu">
-                                <!--Options-->
-                                <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#profile">Profile</a>
-                                <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>                    
-                                <a class="dropdown-item" href="logout.php">Logout</a>
-                            </div>
-                        ';
+                        if($userType == "jobseeker") {
+                            echo '
+                                <div class="dropdown-menu">
+                                    <!--Options-->
+                                    <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#profile">Profile</a>
+                                    <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>                    
+                                    <a class="dropdown-item" href="logout.php">Logout</a>
+                                </div>
+                            ';
+                        } else {
+                            echo '
+                                <div class="dropdown-menu">
+                                    <!--Options-->
+                                    <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#employer-profile">Profile</a>
+                                    <a class="dropdown-item" href="employer/edit-profile.php">Edit</a>                    
+                                    <a class="dropdown-item" href="logout.php">Logout</a>
+                                </div>
+                            ';
+                        }
                     } else {
                         echo '
                         <div class="dropdown-menu">
@@ -156,30 +182,58 @@
                         <div id="search" class="bg-light mb-4 p-5">
                             <h1 class="text-center">Search Jobs</h1>
 
-                            <form action="#" method="POST" class="mt-5" id="searchForm">
-                                <div class="row justify-content-center mb-3">
-                                    <div class="col-md p-2">
-                                        <input type="text" class="form-control" id="title" name="title" placeholder="Job Title" required>
-                                    </div>
-                                    <div class="col-md p-2">
-                                        <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
-                                    </div>
-                                    <div class="col-md p-2">
-                                        <input type="number" class="form-control" id="salary" name="salary" placeholder="Salary">
-                                    </div>
-                                    <div class="col-md p-2">
-                                        <input type="number" class="form-control" id="experience" name="experience" placeholder="Experience">
-                                    </div>
-                                    <div class="col-md p-2">
-                                        <input type="text" class="form-control" id="location" name="location" placeholder="Location">
-                                    </div>
-                                </div>
-                                <div class="row justify-content-center">
-                                    <div class="col-sm-3 p-3">
-                                        <button id="search-btn" type="submit" class="btn btn btn-block btn-secondary">Search</button>
-                                    </div>
-                                </div>
-                            </form>
+                            <?php
+                                if($loggedin) {
+                                    $statement = $con->prepare("SELECT verified FROM jobseeker WHERE id = '".$_SESSION["id"]."';");
+                                    $statement->execute();
+                                    $result = $statement->fetch(PDO::FETCH_ASSOC);
+
+                                    if($result["verified"] == "true") {
+
+                            ?>
+
+                                    <form action="#" method="POST" class="mt-5" id="searchForm">
+                                        <div class="row justify-content-center mb-3">
+                                            <div class="col-md p-2">
+                                                <input type="text" class="form-control" id="title" name="title" placeholder="Job Title" required>
+                                            </div>
+                                            <div class="col-md p-2">
+                                                <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
+                                            </div>
+                                            <div class="col-md p-2">
+                                                <input type="number" class="form-control" id="salary" name="salary" placeholder="Salary">
+                                            </div>
+                                            <div class="col-md p-2">
+                                                <input type="number" class="form-control" id="experience" name="experience" placeholder="Experience">
+                                            </div>
+                                            <div class="col-md p-2">
+                                                <input type="text" class="form-control" id="location" name="location" placeholder="Location">
+                                            </div>
+                                        </div>
+                                        <div class="row justify-content-center">
+                                            <div class="col-sm-3 p-3">
+                                                <button id="search-btn" type="submit" class="btn btn btn-block btn-secondary">Search</button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                            <?php 
+                                    } else {
+                                        echo '
+                                            <div class="text-center mt-4">
+                                                <p>This feature will be made available once your account is validated.</p>
+                                            </div>
+                                        ';
+                                    }
+                                } else {
+                                    echo '
+                                        <div class="text-center mt-4">
+                                            <p>This feature is only available to registered users.</p>
+                                        </div>
+                                    ';
+                                }
+                            ?>
+
                         </div>
                     
                     <!-- Company Details -->
@@ -318,8 +372,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-outline-dark" id="loginbtn" name="loginbtn">Login</button>
+                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-dark" id="loginbtn" name="loginbtn">Login</button>
                     </div>
                 </form>
               </div>
@@ -349,7 +403,7 @@
             </div>
         </div>
 
-        <!-- Profile Modal -->
+        <!-- Job Seeker Profile Modal -->
         <div class="modal fade" id="profile">
             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -409,7 +463,74 @@
                 </div>
             </div>
         </div>
-            
+
+        <!-- Employer Profile Modal -->
+        <div class="modal fade" id="employer-profile">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Your Profile</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                <div class="modal-body container">
+                    <?php
+                        $sql = "SELECT cname, rname, sector, formed, pan, type, address, phone, remail, cemail, website, no_of_emp, logo FROM employer WHERE id = '".$_SESSION["id"]."'";
+                        $statement = $con->prepare($sql);
+                        $statement->execute();
+                        $row = $statement->fetch(PDO::FETCH_ASSOC);
+
+                        if($row['logo'] == "") {
+                            echo '
+                                <div class="text-center bg-light mb-3"><img src="images/default.png" alt="logo" class="p-2" height="200" width="200"></div>
+                            ';
+                        } else {
+                            echo '
+                                <div class="text-center bg-light mb-3"><img src="uploads/logo/'.$row['logo'].'" alt="logo" class="p-2" height="200" width="200"></div>
+                            ';
+                        }
+
+                        echo '
+                        
+                            <b><i class="fas fa-user"></i> Recruiter</b><hr>
+
+                            <p><b>Name: </b>'.$row['rname'].'</p>
+
+                            <p><b>Email: </b>'.$row['remail'].'</p>
+
+                            <br><b><i class="fas fa-building"></i> Company Details</b><hr>
+
+                            <p><b>Name: </b>'.$row['cname'].'</p>
+                            
+                            <p><b>Type: </b>'.$row['type'].'</p>
+                            
+                            <p><b>Sector: </b>'.$row['sector'].'</p>
+                            
+                            <p><b>Formed: </b>'.$row['formed'].'</p>
+                            
+                            <p><b>PAN: </b>'.$row['pan'].'</p>
+                            
+                            <p><b>Address: </b>'.$row['address'].'</p>
+                            
+                            <p><b>Email: </b>'.$row['cemail'].'</p>
+                            
+                            <p><b>Phone: </b>'.$row['phone'].'</p>
+                            
+                            <p><b>Website: </b>'.$row['website'].'</p>
+
+                            <p><b>Number of Employees: </b>'.$row['no_of_emp'].'</p>
+                            
+                        ';
+                    ?>
+                </div>
+                <div class="modal-footer">
+                    <a href="employer/edit-profile.php" class="btn btn-outline-dark">Edit</a>
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>         
     
         <!--Footer-->
         <div id="footer" class="footer bg-dark">

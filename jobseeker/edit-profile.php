@@ -1,9 +1,11 @@
 <?php
+    header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com https://cdn.jsdelivr.net");
+
     require "../connect.php";
     session_start();
     $loggedin = false;
 
-    if(isset($_SESSION["loggedin"])) {
+    if(isset($_SESSION["loggedin"]) && $_SESSION["userType"] == "jobseeker") {
         if($_SESSION["loggedin"] == true) {
             $loggedin = true;
         }
@@ -11,7 +13,7 @@
         header("location:../");
     }
 
-    $fileOk = array('valid' => true, 'error' => '');
+    $file = array('valid' => true, 'error' => '');
     
     // Obtain Personal Details & Experience
     $sql = "SELECT name,email,phone,address,fresher,present_company,designation,salary,experience FROM jobseeker WHERE id = '".$_SESSION["id"]."';";
@@ -44,39 +46,42 @@
 
     if(isset($_POST["name"])) {
         // Personal details
-        $name = $_POST['name'];
-        $email = $_POST['email'];
-        $address = $_POST['address'];
-        $phone = $_POST['phone'];
+        $name = filter_var($_POST['name'], FILTER_SANITIZE_ENCODED);
+        $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+        $address = filter_var($_POST['address'], FILTER_SANITIZE_ENCODED);
+        $phone = filter_var($_POST["phone"], FILTER_SANITIZE_NUMBER_INT);
 
         // Secondary Education
-        $sboard = $_POST["sboard"];
-        $syop = $_POST["syop"];
-        $smarks = $_POST["smarks"];
+        $sboard = filter_var($_POST['sboard'], FILTER_SANITIZE_ENCODED);
+        $syop = filter_var($_POST["syop"], FILTER_SANITIZE_NUMBER_INT);
+        $smarks = filter_var($_POST["smarks"], FILTER_SANITIZE_NUMBER_INT);
         
         // Higher Secondary Education
-        $hsboard = $_POST["hsboard"];
-        $stream = $_POST["stream"];
-        $hsyop = $_POST["hsyop"];
-        $hsmarks = $_POST["hsmarks"];
+        $hsboard = filter_var($_POST['hsboard'], FILTER_SANITIZE_ENCODED);
+        $stream = filter_var($_POST['stream'], FILTER_SANITIZE_ENCODED);
+        $hsyop = filter_var($_POST["hsyop"], FILTER_SANITIZE_NUMBER_INT);
+        $hsmarks = filter_var($_POST["hsmarks"], FILTER_SANITIZE_NUMBER_INT);
 
         // Undergraduation
-        $university = $_POST["university"];
-        $department = $_POST["department"];
-        $ugyop = $_POST["ugyop"];
-        $ugmarks = $_POST["ugmarks"];
+        $university = filter_var($_POST['university'], FILTER_SANITIZE_ENCODED);
+        $department = filter_var($_POST['department'], FILTER_SANITIZE_ENCODED);
+        $ugyop = filter_var($_POST["ugyop"], FILTER_SANITIZE_NUMBER_INT);
+        $ugmarks = filter_var($_POST["ugmarks"], FILTER_SANITIZE_NUMBER_INT);
 
         // Experience
         $fresher = isset($_POST["fresher"]) == true ? "true" : "false";
         if($fresher == "false"){
-            $present_company = $_POST['present_company'];
-            $designation = $_POST['designation'];
-            $salary = $_POST['salary'];
-            $experience = $_POST['experience'];
+            $present_company = filter_var($_POST['present_company'], FILTER_SANITIZE_ENCODED);
+            $designation = filter_var($_POST['designation'], FILTER_SANITIZE_ENCODED);
+            $salary = filter_var($_POST["salary"], FILTER_SANITIZE_NUMBER_INT);
+            $experience = filter_var($_POST["experience"], FILTER_SANITIZE_NUMBER_INT);
         }
 
         // Skills
         $skills = json_decode($_POST["skills"]);
+        for ($i=0; $i < count($skills); $i++) {
+            $skills[$i] = filter_var($skills[$i], FILTER_SANITIZE_ENCODED);
+        }
 
         // Update personal details
         $con->beginTransaction();
@@ -111,13 +116,12 @@
         $con->commit();
 
         // Update skills
-        $con->beginTransaction();
         $sql = "DELETE from jsskills WHERE jsid = '".$_SESSION["id"]."';";
         foreach ($skills as $skill) {
             $sql .= "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', '".$skill."');";
         }
-        $response = $con->exec($sql);
-        $con->commit();
+        $statement = $con->prepare($sql);
+        $statement->execute();
 
         // CV upload
         if(isset($_FILES["cv"]) && $_FILES['cv']['error'] == UPLOAD_ERR_OK) {
@@ -141,17 +145,17 @@
 
             // Check file size
             if ($_FILES["cv"]["size"] > 10000000) {
-                $fileOk['valid'] = false;
-                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is greater than 10MB.';
+                $file['valid'] = false;
+                $file['error'] = 'Your profile has been updated. Your CV was not uploaded since it is greater than 10MB.';
             }
 
             // Allow certain file formats
             if($fileExtension != "pdf" && $fileExtension != "doc" && $fileExtension != "docx") {
-                $fileOk['valid'] = false;
-                $fileOk['error'] = 'Your profile has been updated. Your CV was not uploaded since it is of an invalid extension. Allowed formats: PDF, DOC, DOCX.';
+                $file['valid'] = false;
+                $file['error'] = 'Your profile has been updated. Your CV was not uploaded since it is of an invalid extension. Allowed formats: PDF, DOC, DOCX.';
             }
 
-            if ($fileOk['valid'] == true) {
+            if ($file['valid'] == true) {
                 if (move_uploaded_file($_FILES["cv"]["tmp_name"], $target_file)) {
                     $con->beginTransaction();
                     $sql = "UPDATE jobseeker SET cv ='".$newFileName."' WHERE id = '".$_SESSION["id"]."';";
@@ -159,12 +163,10 @@
                     $con->commit();
                 } else {
                     header("Location: edit-profile.php?error=true");
-                    // echo "<script>window.location.href='edit-profile.php?error=true'</script>";
                 }
             }
         }
         header("Location: edit-profile.php?success=true");
-        // echo "<script>window.location.href='edit-profile.php?success=true'</script>";
     }
 
     if(isset($_POST["deletebtn"])){
@@ -245,8 +247,22 @@
         </div>
 
         <div class="page-container">
-            <div class="alert alert-danger" role="alert" id="error" style="display: none;"></div>
-            <div class="alert alert-success" role="alert" id="success" style="display: none;"></div>
+
+            <div class="alert alert-danger" role="alert" id="error" style="display: none;">
+                <?php 
+                    if($file['valid'] == false) {
+                        echo $file['error'];
+                    } else {
+                        echo '
+                            Your profile has been updated but the server faced an internal error and your CV was not uploaded. Try again.
+                        ';
+                    }
+                ?>
+            </div>
+            <div class="alert alert-success" role="alert" id="success" style="display: none;">
+                <p>Your profile has been updated successfully.</p>
+            </div>
+
             <div class="content-wrap container">
                 <div class="text-center">
                     <h2>Edit Your Profile</h2>
@@ -491,12 +507,13 @@
                             Are you sure you want to permanently delete your profile?
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                             <button type="submit" name="deletebtn" class="btn btn-danger">Delete</button>
                         </div>
                     </div>
                 </div>
             </div>
+
         </form>
 
         <!--Footer-->
@@ -508,108 +525,28 @@
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+                <a href="#">Privacy Policy</a>
             </div>
         </div>
 
     <!-- Optional JavaScript -->
     <script src="../js/nav.js"></script>
-    <script>
-        const skillAddBtn = document.getElementById('skill-add');
-        const skillInput = document.getElementById('skill-input');
-        const skillContainer = document.getElementById('skill-container');
-        const form = document.getElementById('profileEditForm');
-        const updateBtn = document.getElementById('updatebtn');
+    <script src="js/jobseeker.js"></script>
 
-        const addSkill = function(e) {
-            if(skillInput.value !== '') {
-                const div = document.createElement('div');
-                div.classList.add('p-1');
-                div.innerHTML = `<a class="btn btn-sm btn-dark" href="#" role="button">${skillInput.value}</a>`;
-                skillContainer.appendChild(div);
-                skillInput.value = '';
-            }
+    <?php
+        if($checked == "true") {
+            echo "<script src='js/fresher.js'></script>";
+        }
+            
+        if($file['valid'] == false || isset($_REQUEST['error'])) {
+            echo "<script src='../js/error.js'></script>";
         }
 
-        skillAddBtn.addEventListener('click', addSkill);
-        document.addEventListener('keydown', function(e) {
-            if(e.keyCode === 13) {
-                e.preventDefault();
-                addSkill();
-            }
-        })
+        if(isset($_REQUEST['success'])) {
+            echo "<script src='../js/success.js'></script>";
+        }
+    ?>
 
-        updateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const skillContainerNodes = skillContainer.children;
-            const skills = [];
-            for(let element of skillContainerNodes) {
-                skills.push(element.childNodes[0].innerHTML);
-            }
-            const hInput = document.createElement('input');
-            hInput.type = 'hidden';
-            hInput.name = 'skills';
-            hInput.value = JSON.stringify(skills);
-            form.appendChild(hInput);
-            form.submit();
-        });
-
-        skillContainer.addEventListener('click', function(e) {
-            e.preventDefault();
-            if(e.target.classList.contains('btn')) {
-                e.target.parentNode.remove();
-            }
-        });
-
-        // Initialize BSCustomFileInput plugin for showing File Input name
-        window.addEventListener('DOMContentLoaded', (event) => {
-            bsCustomFileInput.init();
-        });
-    </script>
-    <script>
-        const checkbox = document.getElementById('fresher');
-        checkbox.addEventListener('click', function(e) {
-            if(checkbox.checked === true) {
-                document.getElementById('present_company').disabled = true;
-                document.getElementById('designation').disabled = true;
-                document.getElementById('salary').disabled = true;
-                document.getElementById('experience').disabled = true;
-                
-            } else {
-                document.getElementById('present_company').disabled = false;
-                document.getElementById('designation').disabled = false;
-                document.getElementById('salary').disabled = false;
-                document.getElementById('experience').disabled = false;
-            }
-        });
-
-        <?php
-            if($checked == "true") {
-                echo "document.getElementById('fresher').click()";
-            }
-            
-            if($fileOk['valid'] == false) {
-                echo "
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').innerHTML = '".$fileOk["error"]."';
-                ";
-            }
-
-            if(isset($_REQUEST['error'])) {
-                echo "
-                    document.getElementById('error').style.display = 'block';
-                    document.getElementById('error').innerHTML = 'Your profile has been updated but the server faced an internal error and your CV was not uploaded. Try again.';
-                ";
-            }
-
-            if(isset($_REQUEST['success'])) {
-                echo "
-                    document.getElementById('success').style.display = 'block';
-                    document.getElementById('success').innerHTML = 'Your profile has been updated successfully.';
-                ";
-            }
-        ?>
-    </script>
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
