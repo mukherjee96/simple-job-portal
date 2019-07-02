@@ -25,22 +25,35 @@
 
         $error = false;
 
-        $cname = filter_var($_POST["cname"], FILTER_SANITIZE_ENCODED);
-        $cemail = filter_var($_POST["cemail"], FILTER_SANITIZE_EMAIL);
-        $address = filter_var($_POST["address"], FILTER_SANITIZE_ENCODED);
-        $phone = filter_var($_POST["phone"], FILTER_SANITIZE_NUMBER_INT);
-        $website = filter_var($_POST["website"], FILTER_SANITIZE_URL);
-        $sector = filter_var($_POST["sector"], FILTER_SANITIZE_ENCODED);
-        $formed = filter_var($_POST["formed"], FILTER_SANITIZE_NUMBER_INT);
-        $no_of_em = filter_var($_POST["no_of_emp"], FILTER_SANITIZE_NUMBER_INT);
-        $type = filter_var($_POST["type"], FILTER_SANITIZE_ENCODED);
-        $pan = filter_var($_POST["pan"], FILTER_SANITIZE_ENCODED);
-        $rname = filter_var($_POST["rname"], FILTER_SANITIZE_ENCODED);
-        $remail = filter_var($_POST["remail"], FILTER_SANITIZE_EMAIL);
+        $cname = $_POST["cname"];
+        $cemail = $_POST["cemail"];
+        $address = $_POST["address"];
+        $phone = $_POST["phone"];
+        $website = $_POST["website"];
+        $sector = $_POST["sector"];
+        $formed = $_POST["formed"];
+        $no_of_emp = $_POST["no_of_emp"];
+        $type = $_POST["type"];
+        $pan = $_POST["pan"];
+        $rname = $_POST["rname"];
+        $remail = $_POST["remail"];
 
-        $sql = "UPDATE employer SET cname = '$cname', cemail = '$cemail', address = '$address', phone = '$phone', website = '$website', sector = '$sector', formed = '$formed', no_of_emp = '$no_of_em', type = '$type', pan = '$pan', rname = '$rname', remail = '$remail' WHERE id = '".$_SESSION["id"]."';";
+        $sql = "UPDATE employer SET cname = :cname, cemail = :cemail, address = :address, phone = :phone, website = :website, sector = :sector, formed = :formed, no_of_emp = :no_of_emp, type = :type, pan = :pan, rname = :rname, remail = :remail WHERE id = '".$_SESSION["id"]."';";
         $statement = $con->prepare($sql);
-        if(!$statement->execute()) {
+        if(!$statement->execute(array(
+            'cname' => $cname,
+            'rname' => $rname,
+            'sector' => $sector,
+            'formed' => $formed,
+            'pan' => $pan,
+            'type' => $type,
+            'address' => $address,
+            'phone' => $phone,
+            'remail' => $remail,
+            'cemail' => $cemail,
+            'website' => $website,
+            'no_of_emp' => $no_of_emp
+        ))) {
             $error = true;
         }
 
@@ -80,8 +93,7 @@
                 if (move_uploaded_file($_FILES["logo"]["tmp_name"], $target_file)) {
                     $sql = "UPDATE employer SET logo ='".$newFileName."' WHERE id = '".$_SESSION["id"]."';";
                     $statement = $con->prepare($sql);
-                    $statement->execute();
-                    if(!$statement->rowCount())
+                    if(!$statement->execute())
                         $error = true;
                 } else {
                     header("Location: edit-profile.php?error=true");

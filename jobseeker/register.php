@@ -8,13 +8,12 @@
         header("Location: ../");
     } else {
         if(isset($_POST['name'])) {
-            $name = filter_var($_POST['name'], FILTER_SANITIZE_ENCODED);
+            $name = $_POST['name'];
             $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
 
             $sql = "SELECT email FROM jobseeker WHERE email = :email";
             $statement = $con->prepare($sql);
-            $statement->bindParam(array(':email'=>$email));
-            $statement->execute();
+            $statement->execute(array(':email' => $email));
 
             if(!$statement->rowCount() && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $pass = $_POST['password'];
@@ -29,26 +28,24 @@
 
                     $sql = "INSERT INTO jobseeker(id, name, email, password, verified) VALUES ('$id', :name, :email, '$pass', 'false');";
                     $statement = $con->prepare($sql);
-                    $statement->execute(array('name'=>$name, 'email'=>$email));
-                    if(!$statement->rowCount())
-                        $error = true;
+                    if(!$statement->execute(array(
+                        'name'=>$name, 
+                        'email'=>$email
+                    ))) $error = true;
     
                     $sql = "INSERT INTO jstenth(jsid) VALUES ('$id');";
                     $statement = $con->prepare($sql);
-                    $statement->execute();
-                    if(!$statement->rowCount())
+                    if(!$statement->execute())
                         $error = true;
 
                     $sql = "INSERT INTO jstwelveth(jsid) VALUES ('$id');";
                     $statement = $con->prepare($sql);
-                    $statement->execute();
-                    if(!$statement->rowCount())
+                    if(!$statement->execute())
                         $error = true;
     
                     $sql = "INSERT INTO jsug(jsid) VALUES ('$id');";
                     $statement = $con->prepare($sql);
-                    $statement->execute();
-                    if(!$statement->rowCount())
+                    if(!$statement->execute())
                         $error = true;
     
                     if(!$error) {

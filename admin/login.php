@@ -2,11 +2,11 @@
     require "../connect.php";
     session_start();
     if(isset($_POST['loginbtn'])){
-        $statement = $con->prepare("SELECT email,password FROM admin");
+        $statement = $con->prepare("SELECT username, password FROM admin");
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if($_POST['email'] == $result['email'] && $_POST['password'] == $result['password']){
+        if($_POST['username'] == $result['username'] && $_POST['password'] == $result['password']){
             $_SESSION['admin'] = true;
             header('location:index.php');
         }
@@ -42,8 +42,8 @@
                 <h3 class="text-center pb-3">Please sign in</h3>
                 <form action="login.php" method="POST">
                     <div class="form-group">
-                        <label for="email">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                        <label for="email">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="Username">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
@@ -57,14 +57,14 @@
                 </form>
             </div>
         <?php 
-        if(isset($_REQUEST['error']))
-        echo '
-        <div class="container">
-            <div class="alert alert-danger" role="alert" id="error">
-                <p>Invalid email or password. Please try again.</p>
-            </div>
-        </div>
-        ';
+            if(isset($_REQUEST['error']))
+                echo '
+                    <div class="container">
+                        <div class="alert alert-danger" role="alert" id="error">
+                            <p>Invalid email or password. Please try again.</p>
+                        </div>
+                    </div>
+                ';
         ?>
         </div>
     </div>

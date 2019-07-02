@@ -46,82 +46,104 @@
 
     if(isset($_POST["name"])) {
         // Personal details
-        $name = filter_var($_POST['name'], FILTER_SANITIZE_ENCODED);
-        $email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
-        $address = filter_var($_POST['address'], FILTER_SANITIZE_ENCODED);
-        $phone = filter_var($_POST["phone"], FILTER_SANITIZE_NUMBER_INT);
+        $name = $_POST['name'];
+        $email = $_POST['email'];
+        $address = $_POST['address'];
+        $phone = $_POST["phone"];
 
         // Secondary Education
-        $sboard = filter_var($_POST['sboard'], FILTER_SANITIZE_ENCODED);
-        $syop = filter_var($_POST["syop"], FILTER_SANITIZE_NUMBER_INT);
-        $smarks = filter_var($_POST["smarks"], FILTER_SANITIZE_NUMBER_INT);
+        $sboard = $_POST['sboard'];
+        $syop = $_POST["syop"];
+        $smarks = $_POST["smarks"];
         
         // Higher Secondary Education
-        $hsboard = filter_var($_POST['hsboard'], FILTER_SANITIZE_ENCODED);
-        $stream = filter_var($_POST['stream'], FILTER_SANITIZE_ENCODED);
-        $hsyop = filter_var($_POST["hsyop"], FILTER_SANITIZE_NUMBER_INT);
-        $hsmarks = filter_var($_POST["hsmarks"], FILTER_SANITIZE_NUMBER_INT);
+        $hsboard = $_POST['hsboard'];
+        $stream = $_POST['stream'];
+        $hsyop = $_POST["hsyop"];
+        $hsmarks = $_POST["hsmarks"];
 
         // Undergraduation
-        $university = filter_var($_POST['university'], FILTER_SANITIZE_ENCODED);
-        $department = filter_var($_POST['department'], FILTER_SANITIZE_ENCODED);
-        $ugyop = filter_var($_POST["ugyop"], FILTER_SANITIZE_NUMBER_INT);
-        $ugmarks = filter_var($_POST["ugmarks"], FILTER_SANITIZE_NUMBER_INT);
+        $university = $_POST['university'];
+        $department = $_POST['department'];
+        $ugyop = $_POST["ugyop"];
+        $ugmarks = $_POST["ugmarks"];
 
         // Experience
         $fresher = isset($_POST["fresher"]) == true ? "true" : "false";
         if($fresher == "false"){
-            $present_company = filter_var($_POST['present_company'], FILTER_SANITIZE_ENCODED);
-            $designation = filter_var($_POST['designation'], FILTER_SANITIZE_ENCODED);
-            $salary = filter_var($_POST["salary"], FILTER_SANITIZE_NUMBER_INT);
-            $experience = filter_var($_POST["experience"], FILTER_SANITIZE_NUMBER_INT);
+            $present_company = $_POST['present_company'];
+            $designation = $_POST['designation'];
+            $salary = $_POST["salary"];
+            $experience = $_POST["experience"];
         }
 
         // Skills
         $skills = json_decode($_POST["skills"]);
-        for ($i=0; $i < count($skills); $i++) {
-            $skills[$i] = filter_var($skills[$i], FILTER_SANITIZE_ENCODED);
-        }
+
+        $error = false;
 
         // Update personal details
-        $con->beginTransaction();
-        $sql = "UPDATE jobseeker SET name='".$name."', email='".$email."', address='".$address."', phone='".$phone."';";
-        $response = $con->exec($sql);
-        $con->commit();
+        $sql = "UPDATE jobseeker SET name = :name, email = :email, address = :address, phone = :phone";
+        $statement = $con->prepare($sql);
+        if(!$statement->execute(array(
+            'name' => $name,
+            'email' => $email,
+            'address' => $address,
+            'phone' => $phone
+        ))) { $error = true; }
 
         //Update Experience
         if($fresher == "false") {
-            $con->beginTransaction();
-            $sql = "UPDATE jobseeker SET fresher='".$fresher."', present_company='".$present_company."', designation='".$designation."', salary='".$salary."', experience='".$experience."' WHERE id = '".$_SESSION['id']."';";
-            $response = $con->exec($sql);
-            $con->commit();
+            $sql = "UPDATE jobseeker SET fresher = :fresher, present_company = :present_company, designation = :designation, salary = :$salary, experience = :experience WHERE id = '".$_SESSION['id']."'";
+            $statement = $con->prepare($sql);
+            if(!$statement.execute(array(
+                'fresher' => $fresher,
+                'present_company' => $present_company,
+                'designation' => $designation,
+                'salary' => $salary,
+                'experience' => $experience
+            ))) { $error = true; }
         }
 
         // Update secondary education
-        $con->beginTransaction();
-        $sql = "UPDATE jstenth SET board='".$sboard."', yop='".$syop."', marks='".$smarks."' WHERE jsid = '".$_SESSION['id']."';";
-        $response = $con->exec($sql);
-        $con->commit();
+        $sql = "UPDATE jstenth SET board = :board, yop = :yop, marks = :marks WHERE jsid = '".$_SESSION['id']."'";
+        $statement = $con->prepare($sql);
+        if(!$statement->execute(array(
+            'board' => $sboard,
+            'yop' => $syop,
+            'marks' => $smarks
+        ))) { $error = true; }
 
         // Update higher secondary education
-        $con->beginTransaction();
-        $sql = "UPDATE jstwelveth SET board='".$hsboard."', stream='".$stream."', yop='".$hsyop."', marks='".$hsmarks."' WHERE jsid = '".$_SESSION['id']."';";
-        $response = $con->exec($sql);
-        $con->commit();
+        $sql = "UPDATE jstwelveth SET board = :board, stream = :stream, yop = :yop, marks = :marks WHERE jsid = '".$_SESSION['id']."';";
+        $statement = $con->prepare($sql);
+        if($statement->execute(array(
+            'board' => $hsboard,
+            'stream' => $stream,
+            'yop' => $hsyop,
+            'marks' => $hsmarks
+        ))) { $error = true; }
 
         // Update undergraduation details
-        $con->beginTransaction();
-        $sql = "UPDATE jsug SET university='".$university."', dept='".$department."', yop='".$ugyop."', marks='".$ugmarks."' WHERE jsid = '".$_SESSION['id']."';";
-        $response = $con->exec($sql);
-        $con->commit();
+        $sql = "UPDATE jsug SET university = :university, dept = :department, yop = :yop marks = :marks WHERE jsid = '".$_SESSION['id']."';";
+        $statement = $con->preapre($sql);
+        if(!$statement->execute(array(
+            'university' => $university,
+            'dept' => $department,
+            'yop' => $ugyop,
+            'marks' => $ugmarks
+        ))) { $error = true; }
 
         // Update skills
         $sql = "DELETE from jsskills WHERE jsid = '".$_SESSION["id"]."';";
-        foreach ($skills as $skill) {
-            $sql .= "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', '".$skill."');";
-        }
         $statement = $con->prepare($sql);
         $statement->execute();
+
+        $sql .= "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', :skill)";
+        $statement = $con->prepare($sql);
+        foreach ($skills as $skill) {
+            if(!$statement->execute(array('skill' => $skill))) { $error = true; }
+        }
 
         // CV upload
         if(isset($_FILES["cv"]) && $_FILES['cv']['error'] == UPLOAD_ERR_OK) {
@@ -157,23 +179,28 @@
 
             if ($file['valid'] == true) {
                 if (move_uploaded_file($_FILES["cv"]["tmp_name"], $target_file)) {
-                    $con->beginTransaction();
                     $sql = "UPDATE jobseeker SET cv ='".$newFileName."' WHERE id = '".$_SESSION["id"]."';";
-                    $reponse = $con->exec($sql);
-                    $con->commit();
+                    $statement = $con->prepare($sql);
+                    if(!$statement->execute()) {
+                        header("Location: edit-profile.php?error=true");
+                    }
                 } else {
                     header("Location: edit-profile.php?error=true");
                 }
             }
         }
-        header("Location: edit-profile.php?success=true");
+        
+        if($error) {
+            header("Location: edit-profile.php?error=true");
+        } else {
+            header("Location: edit-profile.php?success=true");
+        }
     }
 
     if(isset($_POST["deletebtn"])){
-        $con->beginTransaction();
         $sql = "DELETE FROM jobseeker WHERE id = ".$_SESSION['id'].";";
-        $response = $con->exec($sql);
-        $con->commit();
+        $statement = $con->prepare($sql);
+        $statement->execute();
     }
 
 ?>
@@ -475,7 +502,7 @@
                                 <?php
                                     foreach ($skills as $skill) {
                                         echo '
-                                            <div class="p-1"><a class="btn btn-sm btn-dark" href="#" role="button">'.$skill['skill'].'</a></div>
+                                            <div class="p-1"><a class="btn btn-sm btn-dark" href="#" role="button">'.html_entity_decode($skill['skill']).'</a></div>
                                         ';
                                     }
                                 ?>

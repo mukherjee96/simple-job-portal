@@ -22,7 +22,7 @@
   }
   
   .content-wrap {
-    padding-top: 3rem;
+    padding-top: 2rem;
     padding-bottom: 3rem; 
   }
   
@@ -34,6 +34,11 @@
 
   .carousel {
     z-index: 0;
+  }
+
+  .scroll {
+    height: 300px;
+    overflow-y: scroll;
   }
 
   .footer i, .nav i, .btn-round i {
@@ -53,9 +58,14 @@
       background-color: #e2e2e2;
   }
 
+  /* .logo {
+    margin-left: 75px;
+  } */
+
   .brand {
-    padding-top: auto;
-    padding-bottom: auto;
+    padding-top: 0;
+    padding-bottom: 0;
+    /* padding-left: 1rem; */
     padding-left: 5.5rem;
     font-size: 30px;
   }
@@ -73,6 +83,10 @@
     height: 53px;
     width: 53px; 
     border-radius: 50%;
+  }
+
+  .border {
+    border: 1px solid rgb(226, 226, 226);
   }
 
   .skill-border {

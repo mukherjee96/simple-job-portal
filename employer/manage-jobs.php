@@ -16,29 +16,66 @@
         header("location:../index.php");
     }
 
-    if(isset($_POST['addJobBtn'])) {
+    if(isset($_POST['emp-title'])) {
         $error = false;
 
         $id = $_SESSION["id"];
-        $title = filter_var($_POST["emp-title"],FILTER_SANITIZE_STRING);
-        $designation = filter_var($_POST["emp-designation"],FILTER_SANITIZE_STRING);
-        $description = filter_var($_POST["emp-description"],FILTER_SANITIZE_STRING);
-        $requirement = filter_var($_POST["emp-requirement"],FILTER_SANITIZE_STRING);
-        $salary = filter_var($_POST["emp-salary"],FILTER_SANITIZE_NUMBER_FLOAT);
-        $experience = filter_var($_POST["emp-experience"],FILTER_SANITIZE_NUMBER_FLOAT);
-        $location = filter_var($_POST["emp-location"],FILTER_SANITIZE_STRING);
+        $title = $_POST["emp-title"];
+        $designation = $_POST["emp-designation"];
+        $description = $_POST["emp-description"];
+        $salary = $_POST["emp-salary"];
+        $experience = $_POST["emp-experience"];
+        $location = $_POST["emp-location"];
+        $skills = json_decode($_POST['skills']);
         
-        $sql = "INSERT INTO jobs(emp_id,title,designation,description,requirements,salary,experience,location,highlighted,available) VALUES('$id','$title','$designation','$description','$requirement','$salary','$experience','$location','false','true')";
+        $sql = "INSERT INTO jobs(emp_id,title,designation,description,salary,experience,location,highlighted,available) VALUES('$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
 
         $statement = $con->prepare($sql);
+        if(!$statement->execute(array(
+            'title' => $title,
+            'designation' => $designation,
+            'description' => $description,
+            'salary' => $salary,
+            'experience' => $experience,
+            'location' => $location
+        ))) { $error = true; }
+
+        $statement = $con->prepare("SELECT id FROM jobs WHERE emp_id = '".$_SESSION["id"]."';");
         $statement->execute();
-        if(!$statement->rowCount())
-            $error = true;
-        
+        $row = $statement->fetchAll();
+
+        $job_id = end($row)["id"];
+
+        $statement = $con->prepare("INSERT INTO jobtech(job_id, technology) VALUES('$job_id', :technology);");
+        foreach ($skills as $skill) {
+            $statement->execute(array('technology' => $skill));
+        }
+
         if(!$error) {
             header("Location: manage-jobs.php?success=true");
         } else {
             header("Location: manage-jobs.php?failed=true");
+        }
+    }
+
+    if(isset($_REQUEST["available"])){
+        $job_id = $_REQUEST["id"];
+
+        $stmt = $con->prepare("SELECT emp_id FROM jobs WHERE id='$job_id'");
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if($result['emp_id'] == $_SESSION['id']) {
+
+            if($_REQUEST["available"] == 'false')
+                $sql = "UPDATE jobs SET available='false' WHERE id='$job_id'";
+            else
+                $sql = "UPDATE jobs SET available='true' WHERE id='$job_id'";
+            $statement = $con->prepare($sql);
+            $statement->execute();
+
+        } else {
+            header("Location: manage-jobs.php");
         }
     }
 ?>
@@ -55,7 +92,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css" />
         <link rel="stylesheet" href="../css/main.css">
-        <title>Job Portal | Home</title>
+        <title>Manage Jobs</title>
     </head>
     <body>
         <!--Navbar-->
@@ -81,7 +118,7 @@
 
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
-            <h2 class="brand"><a href="#">Job Portal</a></h2>
+            <h2 class="brand"><a href="../">Job Portal</a></h2>
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
@@ -113,12 +150,16 @@
             <div class="content-wrap container-fluid">
             
                 <!-- Messages -->
-                <div class="alert alert-success" role="alert" id="success" style="display:none;">
-                    <p>A new job was added.</p>
+                <div class="alert alert-success pb-3" role="alert" id="success" style="display:none;">
+                    <p>The job has been posted.</p>
+                </div>
+
+                <div class="alert alert-success pb-3" role="alert" id="edit-success" style="display:none;">
+                    <p>The job has been edited successfully.</p>
                 </div>
 
                 <div class="alert alert-danger" role="alert" id="jobNotAdded" style="display:none;">
-                    <p>Job was not added. Please try again.</p>
+                    <p>An error ocurred and the job was not posted. Please try again.</p>
                 </div>
 
                 <!-- Post Job Button -->
@@ -131,35 +172,106 @@
                 </div>
 
                 <hr>
-                <div class="justify-content-center text-center m-5">
+                <div class="justify-content-center text-center mb-4 pt-3">
                     <h3>Jobs posted by you</h3>
                 </div>
                 <!-- Cards -->
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-sm-8">
-                            <div class="card">
-                                <div class="card-header">
-                                    <div class="d-flex bd-highlight">
-                                        <div class="mr-auto p-2 bd-highlight"><h5 class="card-title">Web Developer Required</h5></div>
-                                        <div class="p-2 bd-highlight"><a href="#" class="card-link"><i class="fas fa-edit text-dark"></i></a></div>
-                                        <div class="p-2 bd-highlight"><a href="#" class="card-link"><i class="far fa-trash-alt text-dark"></i></a></div>
+                        
+                        <!-- Modified -->
+                        <?php
+                            $sql = "SELECT id,title,designation,description,salary,experience,location FROM jobs WHERE emp_id='".$_SESSION['id']."'";
+                            $statement = $con->prepare($sql);
+                            $statement->execute();
+
+                            if(!$statement->rowCount()){
+                                echo'
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <p>No job was added</p>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-center">
-                                        <p class="card-text m-1"><strong>Designation:</strong> Developer  </p>
-                                        <p class="card-text m-1"><strong>CTC:</strong> 4 LPA</p>
+                                ';
+                            }   
+                            else{
+                                $count = 0;
+                                $rows = $statement->fetchAll();
+                                foreach($rows as $row){
+                                    $count = $count + 1;
+
+                                    $stmt = $con->prepare("SELECT technology FROM jobtech WHERE job_id='".$row["id"]."'");
+                                    $stmt->execute();
+                                    $tech = $stmt->fetchAll();
+               
+                                    $tech_list = array();
+                                    foreach($tech as $t) {
+                                       array_push($tech_list,$t['technology']);
+                                    }
+                                    $allTech = implode(", ",$tech_list);
+
+                                    echo'
+                                    <div class="card mb-4">
+                                        <div class="card-header">
+                                            <div class="d-flex bd-highlight">
+                                                <div class="mr-auto p-2 bd-highlight"><h5 class="card-title">'.$row["title"].'</h5></div>
+                                                <div class="p-2 bd-highlight"><a href="edit-job.php?job='.$row['id'].'" class="card-link"><i class="fas fa-edit text-dark"></i></a></div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row pl-3">
+                                                <div class="col-sm-6 p-2">
+                                                    <p><b>Designation:</b> '.$row["designation"].'</p>
+                                                </div>
+                                                <div class="col-sm-6 p-2">
+                                                    <p><b>Location:</b> '.$row["location"].'</p>
+                                                </div>
+                                            </div>
+                                            <div class="row pl-3">
+                                                <div class="col-sm-6 p-2">
+                                                    <p><b>CTC:</b> '.$row["salary"].' LPA</p>
+                                                </div>
+                                                <div class="col-sm-6 p-2">
+                                                    <p><b>Experience:</b> '.$row["experience"].' year(s)</p>
+                                                </div>
+                                            </div>
+                                            <div class="row pl-3">
+                                                <p class="p-2"><b>Technology:</b> '.$allTech.'</p>
+                                            </div>
+                                            <div class="collapse" id="moreDetails'.$count.'">
+                                                <div class="pl-2">
+                                                    <p><b>Description:</b> '.$row["description"].'</p>
+                                                    <br>
+                                                </div>
+                                            </div>
+                                            <div class="text-center">
+                                                <u><a class="text-dark" data-toggle="collapse" href="#moreDetails'.$count.'" id="more">More Details</a></u>
+                                            </div>
+                                            <hr>
+                                            <div class="text-center mt-2">';
+                                                $st = $con->prepare("SELECT available FROM jobs WHERE id='".$row["id"]."'");
+                                                $st->execute();
+                                                $available = $st->fetch(PDO::FETCH_ASSOC);
+
+                                                if($available['available'] == 'true'){
+                                                    echo'
+                                                        <a href="manage-jobs.php?available=false&id='.$row["id"].'" class="btn btn-outline-dark card-link">Mark as Unavailable</a>
+                                                    ';
+                                                }
+                                                if($available['available'] == 'false'){
+                                                    echo'
+                                                        <a href="manage-jobs.php?available=true&id='.$row["id"].'" class="btn btn-outline-dark card-link">Mark as Available</a> 
+                                                    ';
+                                                }
+                                            echo' </div>
+                                        </div>
                                     </div>
-                                    <div class="d-flex justify-content-center">
-                                        <p class="card-text m-1"><strong>Technology:</strong> Angular, Node</p>
-                                    </div>
-                                    <hr>
-                                    <div class="text-center mt-2">
-                                        <a href="#" class="btn btn-outline-dark card-link">Mark as Unavailable</a> 
-                                    </div>
-                                </div>
-                            </div>
+                                    ';
+                                }
+                            }
+                        ?>
+
                         </div>
                     </div>
                 </div>
@@ -168,17 +280,17 @@
         </div>
 
         <!--Job Form Modal-->
-        <div class="modal fade" id="add-a-job" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal fade" id="add-a-job" tabindex="-1" role="dialog" aria-labelledby="Job Form Modal" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Add a Job</h5>
+                    <h5 class="modal-title" id="modal-title">Add a Job</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="#">
+                    <form method="POST" action="#" id="jobAddForm">
                         <div class="form-group">
                             <label for="emp-title">Title</label>
                             <textarea class="form-control" id="emp-title" name="emp-title" rows="2" placeholder="Job Title (E.g. Urgent Requirement for Project Manager)" maxlength="200" required></textarea>
@@ -192,11 +304,6 @@
                         <div class="form-group">
                             <label for="emp-description">Description</label>
                             <textarea class="form-control" id="emp-description" name="emp-description" rows="4" placeholder="Describe the job in brief" maxlength="1500" required></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="emp-requirement">Requirements</label>
-                            <textarea class="form-control" id="emp-requirement" name="emp-requirement" rows="4" placeholder="State the requirements for the job" maxlength="1500" required></textarea>
                         </div>
                         
                         <div class="form-group">
@@ -213,10 +320,19 @@
                             <label for="emp-location">Location</label>
                             <input type="text" class="form-control" id="emp-location" name="emp-location" placeholder="Enter Location (E.g. Mumbai)" required>
                         </div>
+
+                        <label for="skill-input">Skills Required</label>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" placeholder="Add Technology" id="skill-input">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button" id="skill-add">Add</button>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-wrap skill-border" id="skill-container"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-                        <button type="submit" name="addJobBtn" id="addJobBtn" class="btn btn-outline-dark">Add</button>
+                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                        <button type="submit" name="addJobBtn" id="addJobBtn" class="btn btn-dark">Add</button>
                     </div>
                 </form>
                 </div>
@@ -232,12 +348,13 @@
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+                <a href="#">Privacy Policy</a>
             </div>
         </div>
         
         <!-- Optional JavaScript -->
         <script src="../js/nav.js"></script>
+        <script src="js/employer.js"></script>
         <?php
             if(isset($_REQUEST["failed"])) {
                 if($_REQUEST["failed"] == true) {
@@ -248,6 +365,12 @@
             if(isset($_REQUEST["success"])) {
                 if($_REQUEST["success"] == true) {
                     echo "<script src='../js/success.js'></script>";
+                }
+            }
+
+            if(isset($_REQUEST["edit-success"])) {
+                if($_REQUEST["edit-success"] == true) {
+                    echo "<script src='../js/edit-success.js'></script>";
                 }
             }
         ?>

@@ -5,12 +5,22 @@
     session_start();
     $loggedin = false;
 
+    // Load verification status
+
     if(isset($_SESSION["loggedin"])) {
         if($_SESSION["loggedin"] == true) {
             $loggedin = true;
             $userType = $_SESSION["userType"];
+            if($userType == "jobseeker") {
+                $statement = $con->prepare("SELECT verified FROM jobseeker WHERE id = '".$_SESSION["id"]."'");
+                $statement->execute();
+                $row = $statement->fetch(PDO::FETCH_ASSOC);
+                $_SESSION["verified"] = $row["verified"];
+            }
         }
     }
+
+    // Manage logins
 
     if(isset($_POST["loginbtn"])) {
         $type = $_POST["type"];
@@ -42,11 +52,43 @@
             }
             $_SESSION["email"] = $email;
             $_SESSION["email"] = $email;
-            header("Location: index.php");
+            header("Location: index.php?loggedin=true");
         } else {
             header("Location: index.php?error=true");
         }
     }
+
+    // Fetch highlighted jobs
+
+    $sql = "SELECT id, designation FROM jobs WHERE highlighted = 'true'";
+    $statement = $con->prepare($sql);
+    $statement->execute();
+    $highlights = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : null;
+
+    // Fetch highlighted technologies
+
+    $technologies = array();
+    if(!$highlights == null) {
+        $sql = "SELECT technology FROM jobtech WHERE job_id = :job_id";
+        $statement = $con->prepare($sql);
+        foreach ($highlights as $highlight) {
+            $statement->execute(array('job_id' => $highlight["id"]));
+            if($statement->rowCount()) {
+                foreach ($statement->fetchAll(PDO::FETCH_ASSOC) as $data) {
+                    array_push($technologies, $data["technology"]);
+                }
+            }
+        }
+    } else {
+        $technologies = null;
+    }
+
+    // Fetch highlighted BPOs
+
+    $sql = "SELECT title FROM jobs WHERE designation LIKE '%bpo%' AND highlighted = 'true'";
+    $statement = $con->prepare($sql);
+    $statement->execute();
+    $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : null;
 ?>
 
 <!DOCTYPE html>
@@ -94,7 +136,7 @@
                         } else {
                             echo '
                                 <li><a href="#" data-toggle="modal" data-target="#employer-profile">Profile</a></li>
-                                <li><a href="employer/manage-jobs.php">Post a Job</a></li>
+                                <li><a href="employer/manage-jobs.php">Manage Jobs</a></li>
                                 <li><a href="logout.php">Logout</a></li>
                             ';
                         }
@@ -113,9 +155,13 @@
             </ul>
         </nav>
 
-        <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
-            <h2 class="brand"><a href="#">Job Portal</a></h2>
+
+            <!-- Brand Logo -->
+            <!-- <img class="logo" src="images\default-logo.png" width="40" height="40" alt="Logo"> -->
+
+            <!-- Brand Name -->
+            <h2 class="brand">Job Portal</h2>
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
@@ -165,21 +211,35 @@
                 <div class="row justify-content-center">
                     <div class="col-11">
 
+                        <!-- Messages -->
+
                         <div class="alert alert-success" role="alert" id="success" style="display: none;">
                             <h4 class="alert-heading">Your account has been created.</h4>
-                            <p>You will be able to login to your account once it is approved.</p>
+                            <p>You will be able to search jobs once your account is validated.</p>
+                        </div>
+
+                        <div class="alert alert-success" role="alert" id="loggedin" style="display: none;">
+                            <p>Welcome back!</p>
                         </div>
 
                         <div class="alert alert-danger" role="alert" id="error" style="display: none;">
                             <p>Invalid email or password. Please try again.</p>
                         </div>
 
+                        <div class="alert alert-warning" role="alert" id="warning" style="display: none;">
+                            <p>Access denied. Please login to view this page.</p>
+                        </div>
+
                         <div class="alert alert-success" role="alert" id="loggedout" style="display: none;">
                             <p>You have been logged out.</p>
                         </div>
 
+                        <?php
+                            if(isset($userType) && $userType == 'jobseeker') {
+                        ?>
+
                         <!-- Search -->
-                        <div id="search" class="bg-light mb-4 p-5">
+                        <div id="search" class="bg-light mb-5 p-5">
                             <h1 class="text-center">Search Jobs</h1>
 
                             <?php
@@ -192,7 +252,7 @@
 
                             ?>
 
-                                    <form action="#" method="POST" class="mt-5" id="searchForm">
+                                    <form action="jobs.php" method="POST" class="mt-5" id="searchForm">
                                         <div class="row justify-content-center mb-3">
                                             <div class="col-md p-2">
                                                 <input type="text" class="form-control" id="title" name="title" placeholder="Job Title" required>
@@ -212,7 +272,7 @@
                                         </div>
                                         <div class="row justify-content-center">
                                             <div class="col-sm-3 p-3">
-                                                <button id="search-btn" type="submit" class="btn btn btn-block btn-secondary">Search</button>
+                                                <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-secondary">Search</button>
                                             </div>
                                         </div>
                                     </form>
@@ -235,34 +295,35 @@
                             ?>
 
                         </div>
+
+                        <?php } ?>
                     
                     <!-- Company Details -->
-                        <div id="companies" class="mt-5 pt-5 bg-light">
+                        <div id="companies" class="pt-5 bg-light">
                             <h1 class="text-center">Companies</h1>
 
                             <!--Carousel Code-->
-                            <div id="carouselExampleInterval" class="carousel slide pt-5" data-ride="carousel">
+                            <div id="carouselExampleInterval" class="carousel slide pt-4" data-ride="carousel">
                                 <div class="carousel-inner">
 
                                     <!--Carousel Items-->
                                     <div class="carousel-item active px-4" data-interval="2000">
-                                        <!--Carousel Content Code-->
-                                        <div class="row">
-                                            <div class="col-4 offset-1">                                		
-                                                <img src="https://picsum.photos/id/1/700/600" class="d-block w-100" >
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <div class="p-4">
+                                                <img src="https://picsum.photos/id/1/500/500" height="500" width="500" class="img-fluid">
                                             </div>
-                                            <div class="col-4 offset-2">                                		
-                                                <img src="https://picsum.photos/id/2/700/600" class="d-block w-100" >
+                                            <div class="p-4">
+                                                <img src="https://picsum.photos/id/2/500/500" height="500" width="500" class="img-fluid">
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="carousel-item" data-interval="2000">
-                                        <div class="row">
-                                            <div class="col-4 offset-1">                                		
-                                                <img src="https://picsum.photos/id/3/700/600" class="d-block w-100" >
+                                    <div class="carousel-item px-4" data-interval="2000">
+                                        <div class="d-flex flex-wrap justify-content-center">
+                                            <div class="p-4">
+                                                <img src="https://picsum.photos/id/3/500/500" height="500" width="500" class="img-fluid">
                                             </div>
-                                            <div class="col-4 offset-2">                                		
-                                                <img src="https://picsum.photos/id/4/700/600" class="d-block w-100" >
+                                            <div class="p-4">
+                                                <img src="https://picsum.photos/id/4/500/500" height="500" width="500" class="img-fluid">
                                             </div>
                                         </div>
                                     </div>
@@ -276,8 +337,7 @@
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                     <span class="sr-only">Next</span>
                                 </a>
-                            </div>
-                                    
+                            </div>                             
                         </div>
                     
                     <!-- Highlighted Job -->
@@ -287,43 +347,70 @@
 
                                 <div class="row">
                                     <div class="col-sm p-3">
-                                        <div class="card text-center">
+                                        <div class="card h-100 text-center">
                                             <div class="card-header">
                                                 Designation
                                             </div>
                                             <div class="card-body">
-                                                <!--Generated by PHP-->
-                                                <a href="#">Lorem ipsum</a><br>
-                                                <a href="#">Lorem ipsum</a><br>
-                                                <a href="#">Lorem ipsum</a>
+                                                <?php
+                                                    if($highlights == null) {
+                                                        echo '
+                                                            <p class="card-text">No highlights</p>
+                                                        ';
+                                                    } else {
+                                                        foreach ($highlights as $highlight) {
+                                                            echo '
+                                                                <a class="text-dark" href="jobs.php?technology='.$highlight['designation'].'"><p class="card-text bg-light my-2 py-2">'.$highlight['designation'].'</p></a>
+                                                            ';
+                                                        }
+                                                    }
+                                                ?>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="col-sm p-3">
-                                        <div class="card text-center">
+                                        <div class="card h-100 text-center">
                                             <div class="card-header">
                                                 Technology
                                             </div>
                                             <div class="card-body">
-                                                <!--Generated by PHP-->
-                                                <a href="#">dolor sit</a><br>
-                                                <a href="#">dolor sit</a><br>
-                                                <a href="#">dolor sit</a>
+                                                <?php
+                                                    if($technologies == null) {
+                                                        echo '
+                                                            <p class="card-text">No highlights</p>
+                                                        ';
+                                                    } else {
+                                                        foreach ($technologies as $technology) {
+                                                            echo '
+                                                                <a class="text-dark" href="jobs.php?technology='.$technology.'"><p class="card-text bg-light my-2 py-2">'.$technology.'</p></a>
+                                                            ';
+                                                        }
+                                                    }
+                                                ?>
                                             </div>
                                         </div>
                                     </div>
                                         
                                     <div class="col-sm p-3">
-                                        <div class="card text-center">
+                                        <div class="card h-100 text-center">
                                             <div class="card-header">
                                                 BPO
                                             </div>
                                             <div class="card-body">
-                                                <!--Generated by PHP-->
-                                                <a href="#">amet consectetur</a><br>
-                                                <a href="#">amet consectetur</a><br>
-                                                <a href="#">amet consectetur</a>
+                                                <?php
+                                                    if($bpos == null) {
+                                                        echo '
+                                                            <p class="card-text">No highlights</p>
+                                                        ';
+                                                    } else {
+                                                        foreach ($bpos as $bpo) {
+                                                            echo '
+                                                                <a class="text-dark" href="jobs.php?technology='.$bpo['designation'].'"><p class="card-text bg-light my-2 py-2">'.$bpo['designation'].'</p></a>
+                                                            ';
+                                                        }
+                                                    }
+                                                ?>
                                             </div>
                                         </div>
                                     </div>
@@ -413,53 +500,63 @@
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
-                <div class="modal-body container">
-                    <?php
-                        $sql = "SELECT name, email, phone, address, fresher, present_company, designation, salary, experience, cv FROM jobseeker WHERE id = '".$_SESSION["id"]."'";
-                        $statement = $con->prepare($sql);
-                        $statement->execute();
-                        $row = $statement->fetch(PDO::FETCH_ASSOC);
+                    <div class="modal-body container">
+                        <?php
+                            $sql = "SELECT name, email, phone, address, fresher, present_company, designation, salary, experience, cv, verified FROM jobseeker WHERE id = '".$_SESSION["id"]."'";
+                            $statement = $con->prepare($sql);
+                            $statement->execute();
+                            $row = $statement->fetch(PDO::FETCH_ASSOC);
 
-                        $mFresher = $row['fresher'] == 'true' ? 'Yes' : 'No';
-                        $mPresentCompany = $row['present_company'] == '' ? 'None' : $row['present_company'];
-                        $mDesignation = $row['designation'] == '' ? 'None' : $row['designation'];
-                        $mSalary = $row['salary'] == '' ? 'None' : $row['salary'];
-                        $mExperience = $row['experience'] == '' ? 'None' : $row['experience'];
-                        $mFile = $row['cv'] == '' ? 'none' : $row['cv'];
+                            $mPhone = $row['phone'] == '' ? 'N/A' : $row['phone'];
+                            $mAddress = $row['address'] == '' ? 'N/A' : $row['address'];
+                            $mFresher = $row['fresher'] == 'true' ? 'Yes' : ($row['fresher'] == 'false' ? 'No' : 'N/A');
+                            $mPresentCompany = $row['present_company'] == '' ? 'N/A' : $row['present_company'];
+                            $mDesignation = $row['designation'] == '' ? 'N/A' : $row['designation'];
+                            $mSalary = $row['salary'] == '' ? 'N/A' : "&#8377; " . $row['salary'];
+                            $mExperience = $row['experience'] == '' ? 'N/A' : $row['experience'] . " Years";
+                            $mFile = $row['cv'] == '' ? 'none' : $row['cv'];
 
-                        echo '
-                            
-                            <p><b><i class="fas fa-user"></i> Name: </b>'.$row['name'].'</p>
-                            
-                            <p><b><i class="fas fa-phone"></i> Phone: </b>'.$row['phone'].'</p>
-                            
-                            <p><b><i class="fas fa-envelope"></i> Email: </b>'.$row['email'].'</p>
-                            
-                            <p><b><i class="fas fa-map-marked-alt"></i> Address: </b>'.$row['address'].'</p>
-                            
-                            <p><b><i class="fas fa-briefcase"></i> Fresher: </b>'.$mFresher.'</p>
-                            
-                            <p><b><i class="fas fa-building"></i> Present Company: </b>'.$mPresentCompany.'</p>
-                            
-                            <p><b><i class="fas fa-user-tag"></i> Designation: </b>'.$mDesignation.'</p>
-                            
-                            <p><b><i class="fas fa-money-check-alt"></i> Salary: &#8377;</b>'.$mSalary.'</p>
-                            
-                            <p><b><i class="fas fa-chart-line"></i> Experience: </b>'.$mExperience.' Years</p>
-                            
-                        ';
+                            if($row["verified"] == "true") {
+                                echo '
+                                    <p><b><i class="fas fa-user"></i> Name: </b>'.$row['name'].' <i class="fas fa-check-circle text-success"></i></p>
+                                ';
+                            } else {
+                                echo '
+                                    <p><b><i class="fas fa-user"></i> Name: </b>'.$row['name'].' <small class="text-muted">(validation pending)</small></p>
+                                ';
+                            }
 
-                        if($mFile == 'none') {
-                            echo '<p><b><i class="far fa-file-alt"></i> CV: </b>None. Upload from Edit Profile page.</p>';
-                        } else {
-                            echo '<b><i class="far fa-file-alt"></i> CV: </b><a class="text-dark" href="uploads/cv/'.$mFile.'">View File</a>';
-                        }
-                    ?>
-                </div>
-                <div class="modal-footer">
-                    <a href="jobseeker/edit-profile.php" class="btn btn-outline-dark">Edit</a>
-                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-                </div>
+                            echo '
+                                
+                                <p><b><i class="fas fa-phone"></i> Phone: </b>'.$mPhone.'</p>
+                                
+                                <p><b><i class="fas fa-envelope"></i> Email: </b>'.$row['email'].'</p>
+                                
+                                <p><b><i class="fas fa-map-marked-alt"></i> Address: </b>'.$mAddress.'</p>
+                                
+                                <p><b><i class="fas fa-briefcase"></i> Fresher: </b>'.$mFresher.'</p>
+                                
+                                <p><b><i class="fas fa-building"></i> Present Company: </b>'.$mPresentCompany.'</p>
+                                
+                                <p><b><i class="fas fa-user-tag"></i> Designation: </b>'.$mDesignation.'</p>
+                                
+                                <p><b><i class="fas fa-money-check-alt"></i> Salary: </b>'.$mSalary.'</p>
+                                
+                                <p><b><i class="fas fa-chart-line"></i> Experience: </b>'.$mExperience.'</p>
+                                
+                            ';
+
+                            if($mFile == 'none') {
+                                echo '<p><b><i class="far fa-file-alt"></i> CV: </b>None. Upload from Edit Profile page.</p>';
+                            } else {
+                                echo '<b><i class="far fa-file-alt"></i> CV: </b><a class="text-dark" href="uploads/cv/'.$mFile.'">View File</a>';
+                            }
+                        ?>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="jobseeker/edit-profile.php" class="btn btn-outline-dark">Edit</a>
+                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -469,7 +566,7 @@
             <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Your Profile</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Recruiter Profile</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
@@ -553,14 +650,28 @@
                     echo "<script src='js/success.js'></script>";
                 }
             }
+
             if(isset($_REQUEST["error"])) {
                 if($_REQUEST["error"] == true) {
                      echo "<script src='js/error.js'></script>";
                 }
             }
+
             if(isset($_REQUEST["loggedout"])) {
                 if($_REQUEST["loggedout"] == true) {
                     echo "<script src='js/logout.js'></script>";
+                }
+            }
+
+            if(isset($_REQUEST["access"])) {
+                if($_REQUEST["access"] == "denied") {
+                    echo "<script src='js/warning.js'></script>";
+                }
+            }
+
+            if(isset($_REQUEST["loggedin"])) {
+                if($_REQUEST["loggedin"] == true) {
+                    echo "<script src='js/loggedin.js'></script>";
                 }
             }
         ?>

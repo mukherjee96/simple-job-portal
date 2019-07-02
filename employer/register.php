@@ -28,12 +28,23 @@
             if($pass == $cpass) {
                 
                 $pass = password_hash($pass, PASSWORD_DEFAULT);
-                $con->beginTransaction();
-                $sql = "INSERT INTO employer(cname, rname, sector, formed, pan, type, address, phone, remail, cemail, website, no_of_emp, password) VALUES ('$cname', '$name', '$sector', '$formed', '$pan', '$type', '$address', '$phone', '$email', '$cemail', '$website', '$no_of_emp', '$pass');";
-                $response = $con->exec($sql);
-                $con->commit();
+                $sql = "INSERT INTO employer(cname, rname, sector, formed, pan, type, address, phone, remail, cemail, website, no_of_emp, password) VALUES (:cname, :rname, :sector, :formed, :pan, :type, :address, :phone, :remail, :cemail, :website, :no_of_emp, '$pass');";
+                $statement = $con->prepare($sql);
 
-                if($response) {
+                if($statement->execute(array(
+                    'cname' => $cname,
+                    'rname' => $name,
+                    'sector' => $sector,
+                    'formed' => $formed,
+                    'pan' => $pan,
+                    'type' => $type,
+                    'address' => $address,
+                    'phone' => $phone,
+                    'remail' => $email,
+                    'cemail' => $cemail,
+                    'website' => $website,
+                    'no_of_emp' => $no_of_emp
+                ))) {
                     echo "<script>window.location.href='../index.php?account_created=true'</script>";
                 } else {
                     $error = true;
