@@ -5,30 +5,52 @@
     session_start();
     $loggedin = false;
     $statement;
+    $error;
 
     if(isset($_SESSION["loggedin"])) {
-        if($_SESSION["loggedin"] == true && $_SESSION["verified"] == "true") {
+        if($_SESSION["loggedin"] == true) {
             $loggedin = true;
             $userType = $_SESSION["userType"];
-            $verified = $_SESSION["verified"];
         } else {
             header("Location: index.php");
         }
-    } else {
-        header("Location: index.php?access=denied");
+    }
+
+    if(isset($_REQUEST["apply"])) {
+        // Check if loggged in
+        if(!$loggedin || $userType != "jobseeker") {
+            header("Location: index.php?access=denied");
+        } else {
+
+            // Check if already applied
+            $statement = $con->prepare("SELECT id FROM applications WHERE jsid = '".$_SESSION["id"]."' AND jobid = :jobid");
+            $statement->execute(array("jobid" => $_REQUEST["apply"]));
+            if(!$statement->rowCount()) {
+                
+                // Insert a new row if not
+                $statement = $con->prepare("INSERT INTO applications(jobid, jsid, date, status) VALUES(:jobid, '".$_SESSION["id"]."', :date, 'applied')");
+                if(!$statement->execute(array(
+                    "jobid" => $_REQUEST["apply"],
+                    "date" => date('Y-m-d')
+                ))) { $error = true; } else {
+                    header("Location: jobseeker/my-applications.php?application=successful");
+                }
+            } else {
+                header("Location: jobseeker/my-applications.php?application=present");
+            }
+        }
     }
 
     if(isset($_POST["title"])) {
 
         // Search term specific SQL
-
-        $title = "%".$_POST["title"]."%";
+        $title = $_POST["title"] == "" ? "%null%" : "%".$_POST["title"]."%";
         $designation = $_POST["designation"] == "" ? "%null%" : "%".$_POST["designation"]."%";
-        $salary = $_POST["salary"] == "" ? "%null%" : "%".$_POST["salary"]."%";
-        $experience = $_POST["experience"] == "" ? "%null%" : "%".$_POST["experience"]."%";
+        $salary = $_POST["salary"] == "" ? "0" : $_POST["salary"];
+        $experience = $_POST["experience"] == "" ? "0" : $_POST["experience"];
         $location = $_POST["location"] == "" ? "%null%" : "%".$_POST["location"]."%";
 
-        $sql = "SELECT * FROM jobs WHERE title LIKE :title OR designation LIKE :designation OR salary LIKE :salary OR experience LIKE :experience OR location LIKE :location";
+        $sql = "SELECT * FROM jobs WHERE title LIKE :title OR designation LIKE :designation OR salary >= :salary OR experience >= :experience OR location LIKE :location";
 
         $statement = $con->prepare($sql);
         $statement->execute(array(
@@ -56,7 +78,6 @@
     } else {
 
         // Default SQL
-
         $sql = "SELECT * FROM jobs";
         $statement = $con->prepare($sql);
         $statement->execute();
@@ -90,6 +111,17 @@
         <nav class="nav">
             <ul>
             	
+                <!--Before Login-->
+                <?php
+                    if($loggedin == false) {
+                        echo '
+                            <li><a href="#" data-toggle="modal" data-target="#login">Login</a></li>
+                            <li><a href="#" data-toggle="modal" data-target="#register">Register</a></li>
+                        ';
+                    }
+                ?>
+
+                <!--After Login-->
                 <?php
                     if($loggedin == true) {
                         if($userType == "jobseeker") {
@@ -168,6 +200,13 @@
         <!--Page Content-->
         <div class="page-container">
             <div class="content-wrap container-fluid">
+
+                <!-- Messages -->
+                <div class="alert alert-danger" role="alert" id="error" style="display: none;">
+                    <p>The server encountered an error and your application was not sent. Try again.</p>
+                </div>
+
+                <!-- Content -->
                 <div class="text-center pb-3">
                     <h2>Find Jobs</h2>
                 </div>
@@ -202,6 +241,13 @@
                         $statement = $con->prepare("SELECT cname FROM employer WHERE id = '".$row["emp_id"]."'");
                         $statement->execute();
                         $company = $statement->fetch(PDO::FETCH_ASSOC)["cname"];
+
+                        // Check if applied
+                        if($loggedin) {
+                            $statement = $con->prepare("SELECT id FROM applications WHERE jsid = '".$_SESSION["id"]."' AND jobid = :jobid");
+                            $statement->execute(array("jobid" => $row["id"]));
+                            $applied = $statement->rowCount() ? true : false;
+                        }
             ?>
 
                         <div class="card m-3">
@@ -246,7 +292,7 @@
                                                         foreach ($skills as $skill) {
                                                             echo '
                                                                 <div class="p-1">
-                                                                    <span class="badge badge-secondary">'.$skill['technology'].'</span>
+                                                                    <span class="badge badge-secondary p-1">'.$skill['technology'].'</span>
                                                                 </div>
                                                             ';
                                                         }
@@ -312,7 +358,7 @@
                                                 foreach ($skills as $skill) {
                                                     echo '
                                                         <div class="p-1">
-                                                            <span class="badge badge-secondary">'.$skill['technology'].'</span>
+                                                            <span class="badge badge-secondary p-1">'.$skill['technology'].'</span>
                                                         </div>
                                                     ';
                                                 }
@@ -342,8 +388,24 @@
                                             <p><small><strong>Description: </strong>'.$row['description'].'</small></p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                                        <a href="jobs.php?apply='.$row['id'].'" class="btn btn-dark">Apply</a>
+                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>';
+
+                                    // Check if applied already
+                                    if(isset($applied) && $applied) {
+                                        echo '
+                                            <button class="btn btn-dark" disabled>Applied</button>
+                                        ';
+                                    } else if($row['available'] == 'false') {
+                                        echo '
+                                            <button class="btn btn-dark" disabled>Unavailable</button>
+                                        ';
+                                    } else {
+                                        echo '
+                                            <a href="jobs.php?apply='.$row['id'].'" class="btn btn-dark">Apply</a>
+                                        ';
+                                    }
+                                    
+                                echo '    
                                     </div>
                                 </div>
                             </div>
@@ -434,6 +496,66 @@
                 </div>
             </div>
         </div>
+
+        <!--Login Form-->
+        <div class="modal fade" id="login">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Login</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form id="loginForm" action="index.php" method="POST">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <select class="form-control" name="type" required>
+                                <option hidden>Login As</option>
+                                <option value="employer">Employer</option>
+                                <option value="jobseeker">Job Seeker</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                        <label for="email" class="col-form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                        <label for="password" class="col-form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-dark" id="loginbtn" name="loginbtn">Login</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+        <!--Register Form-->
+        <div class="modal fade" id="register">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Register as</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex justify-content-center">
+                        <a href="employer/register.php" class="btn btn-secondary btn-lg mr-2">Employer</a>
+                        <a href="jobseeker/register.php" class="btn btn-secondary btn-lg">Job Seeker</a>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
     
         <!--Footer-->
         <div id="footer" class="footer bg-dark">
@@ -450,6 +572,11 @@
         
         <!-- Optional JavaScript -->
         <script src="js/nav.js"></script>
+        <?php
+            if($error) {
+                echo '<script src="../js/error.js"></script>';
+            }
+        ?>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>

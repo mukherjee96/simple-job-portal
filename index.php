@@ -120,6 +120,7 @@
                         echo '
                             <li><a href="#" data-toggle="modal" data-target="#login">Login</a></li>
                             <li><a href="#" data-toggle="modal" data-target="#register">Register</a></li>
+                            <li><a href="jobs.php">Browse Jobs</a></li>
                         ';
                     }
                 ?>
@@ -131,6 +132,8 @@
                             echo '
                                 <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
                                 <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
+                                <li><a href="jobseeker/my-applications.php">Applications</a></li>
+                                <li><a href="jobs.php">BrowseJobs</a></li>
                                 <li><a href="logout.php">Logout</a></li>
                             ';
                         } else {
@@ -214,8 +217,7 @@
                         <!-- Messages -->
 
                         <div class="alert alert-success" role="alert" id="success" style="display: none;">
-                            <h4 class="alert-heading">Your account has been created.</h4>
-                            <p>You will be able to search jobs once your account is validated.</p>
+                            <p class="alert-text">Your account has been created successfully.</p>
                         </div>
 
                         <div class="alert alert-success" role="alert" id="loggedin" style="display: none;">
@@ -227,79 +229,44 @@
                         </div>
 
                         <div class="alert alert-warning" role="alert" id="warning" style="display: none;">
-                            <p>Access denied. Please login to view this page.</p>
+                            <p>Please <a href="#" class="alert-link" data-toggle="modal" data-target="#login">login</a> or <a href="#" class="alert-link" data-toggle="modal" data-target="#register">register</a> as job seeker to apply to jobs.</p>
                         </div>
 
                         <div class="alert alert-success" role="alert" id="loggedout" style="display: none;">
                             <p>You have been logged out.</p>
                         </div>
 
-                        <?php
-                            if(isset($userType) && $userType == 'jobseeker') {
-                        ?>
-
                         <!-- Search -->
-                        <div id="search" class="bg-light mb-5 p-5">
+                        <div id="search" class="bg-light mb-4 p-5">
                             <h1 class="text-center">Search Jobs</h1>
-
-                            <?php
-                                if($loggedin) {
-                                    $statement = $con->prepare("SELECT verified FROM jobseeker WHERE id = '".$_SESSION["id"]."';");
-                                    $statement->execute();
-                                    $result = $statement->fetch(PDO::FETCH_ASSOC);
-
-                                    if($result["verified"] == "true") {
-
-                            ?>
-
-                                    <form action="jobs.php" method="POST" class="mt-5" id="searchForm">
-                                        <div class="row justify-content-center mb-3">
-                                            <div class="col-md p-2">
-                                                <input type="text" class="form-control" id="title" name="title" placeholder="Job Title" required>
-                                            </div>
-                                            <div class="col-md p-2">
-                                                <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
-                                            </div>
-                                            <div class="col-md p-2">
-                                                <input type="number" class="form-control" id="salary" name="salary" placeholder="Salary">
-                                            </div>
-                                            <div class="col-md p-2">
-                                                <input type="number" class="form-control" id="experience" name="experience" placeholder="Experience">
-                                            </div>
-                                            <div class="col-md p-2">
-                                                <input type="text" class="form-control" id="location" name="location" placeholder="Location">
-                                            </div>
-                                        </div>
-                                        <div class="row justify-content-center">
-                                            <div class="col-sm-3 p-3">
-                                                <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-secondary">Search</button>
-                                            </div>
-                                        </div>
-                                    </form>
-
-                            <?php 
-                                    } else {
-                                        echo '
-                                            <div class="text-center mt-4">
-                                                <p>This feature will be made available once your account is validated.</p>
-                                            </div>
-                                        ';
-                                    }
-                                } else {
-                                    echo '
-                                        <div class="text-center mt-4">
-                                            <p>This feature is only available to registered users.</p>
-                                        </div>
-                                    ';
-                                }
-                            ?>
-
+                            <form action="jobs.php" method="POST" class="mt-5" id="searchForm">
+                                <div class="row justify-content-center mb-3">
+                                    <div class="col-md p-2">
+                                        <input type="text" class="form-control" id="title" name="title" placeholder="Job Title">
+                                    </div>
+                                    <div class="col-md p-2">
+                                        <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
+                                    </div>
+                                    <div class="col-md p-2">
+                                        <input type="number" class="form-control" id="salary" name="salary" placeholder="Salary">
+                                    </div>
+                                    <div class="col-md p-2">
+                                        <input type="number" class="form-control" id="experience" name="experience" placeholder="Experience">
+                                    </div>
+                                    <div class="col-md p-2">
+                                        <input type="text" class="form-control" id="location" name="location" placeholder="Location">
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <div class="col-sm-3 p-3">
+                                        <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-secondary">Search</button>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
-
-                        <?php } ?>
                     
                     <!-- Company Details -->
-                        <div id="companies" class="pt-5 bg-light">
+                        <div id="companies" class="pt-5 mb-4 bg-light">
                             <h1 class="text-center">Companies</h1>
 
                             <!--Carousel Code-->
@@ -341,7 +308,7 @@
                         </div>
                     
                     <!-- Highlighted Job -->
-                        <div id="highlighted-jobs" class="mt-5 bg-light p-5">    
+                        <div id="highlighted-jobs" class="mb-4 bg-light p-5">    
                             <h1 class="text-center">Highlighted Jobs</h1>
                             <div class="container mt-5">
 
@@ -421,7 +388,7 @@
                         </div>
                     
                     <!-- About Us -->
-                        <div id="about" class="mt-5 bg-light p-5">
+                        <div id="about" class="bg-light p-5">
                             <h1 class="text-center">About Us</h1>
                             <p class="text-center mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque et consequat mi, non sagittis tortor. Donec posuere eros eu ornare finibus. Morbi aliquet dignissim cursus. Donec ultricies nibh blandit, volutpat dui eu, lacinia ante. Aenean fermentum vulputate lacus. Duis efficitur commodo tincidunt. Pellentesque eget enim at lorem interdum bibendum finibus id ante. Proin nec eros sem. Integer interdum vulputate leo, a fermentum tellus scelerisque sed. Sed lobortis est nunc, non consequat magna ornare sed. Sed mi ex, vehicula in ante sit amet, vestibulum suscipit risus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec ut dui mollis, faucibus ante id, pellentesque ante.</p>
                         </div>
@@ -627,7 +594,7 @@
                 </div>
                 </div>
             </div>
-        </div>         
+        </div>
     
         <!--Footer-->
         <div id="footer" class="footer bg-dark">

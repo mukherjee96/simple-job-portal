@@ -59,3 +59,7 @@ document.addEventListener("click", function(e) {
     }
   }
 });
+
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})

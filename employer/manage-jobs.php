@@ -28,10 +28,11 @@
         $location = $_POST["emp-location"];
         $skills = json_decode($_POST['skills']);
         
-        $sql = "INSERT INTO jobs(emp_id,title,designation,description,salary,experience,location,highlighted,available) VALUES('$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
+        $sql = "INSERT INTO jobs(id, emp_id,title,designation,description,salary,experience,location,highlighted,available) VALUES(:id, '$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
 
         $statement = $con->prepare($sql);
         if(!$statement->execute(array(
+            'id' => md5(time().$id),
             'title' => $title,
             'designation' => $designation,
             'description' => $description,
@@ -190,7 +191,7 @@
                                 echo'
                                     <div class="card">
                                         <div class="card-body text-center">
-                                            <p>No job was added</p>
+                                            <p>No jobs have been added yet.</p>
                                         </div>
                                     </div>
                                 ';
@@ -215,8 +216,25 @@
                                     <div class="card mb-4">
                                         <div class="card-header">
                                             <div class="d-flex bd-highlight">
-                                                <div class="mr-auto p-2 bd-highlight"><h5 class="card-title">'.$row["title"].'</h5></div>
-                                                <div class="p-2 bd-highlight"><a href="edit-job.php?job='.$row['id'].'" class="card-link"><i class="fas fa-edit text-dark"></i></a></div>
+                                                <div class="mr-auto p-2 bd-highlight"><h5 class="card-title">'.$row["title"].'</h5></div>';
+
+                                                $st = $con->prepare("SELECT available FROM jobs WHERE id='".$row["id"]."'");
+                                                $st->execute();
+                                                $available = $st->fetch(PDO::FETCH_ASSOC);
+
+                                                if($available['available'] == 'false'){
+
+                                                echo' <div class="p-2 bd-highlight"><a href="manage-jobs.php?available=true&id='.$row['id'].'" class="card-link text-dark" data-toggle="tooltip" data-placement="top" title="Mark as Available"><i class="fas fa-toggle-off"></i></a></div>';
+                                                
+                                                } 
+                                            
+                                                if($available['available'] == 'true'){
+                                                
+                                                echo' <div class="p-2 bd-highlight"><a href="manage-jobs.php?available=false&id='.$row['id'].'" class="card-link text-dark" data-toggle="tooltip" data-placement="top" title="Mark as Unavailable"><i class="fas fa-toggle-on"></i></a></div>';
+
+                                                }
+
+                                                echo '<div class="p-2 bd-highlight"><a href="edit-job.php?job='.$row['id'].'" class="card-link"><i class="fas fa-edit text-dark"></i></a></div>
                                             </div>
                                         </div>
                                         <div class="card-body">
@@ -248,23 +266,18 @@
                                             <div class="text-center">
                                                 <u><a class="text-dark" data-toggle="collapse" href="#moreDetails'.$count.'" id="more">More Details</a></u>
                                             </div>
-                                            <hr>
-                                            <div class="text-center mt-2">';
-                                                $st = $con->prepare("SELECT available FROM jobs WHERE id='".$row["id"]."'");
-                                                $st->execute();
-                                                $available = $st->fetch(PDO::FETCH_ASSOC);
+                                            <hr>';
 
-                                                if($available['available'] == 'true'){
-                                                    echo'
-                                                        <a href="manage-jobs.php?available=false&id='.$row["id"].'" class="btn btn-outline-dark card-link">Mark as Unavailable</a>
-                                                    ';
-                                                }
-                                                if($available['available'] == 'false'){
-                                                    echo'
-                                                        <a href="manage-jobs.php?available=true&id='.$row["id"].'" class="btn btn-outline-dark card-link">Mark as Available</a> 
-                                                    ';
-                                                }
-                                            echo' </div>
+                                            $sql = "SELECT jsid FROM applications WHERE jobid='".$row['id']."'";
+                                            $stmt = $con->prepare($sql);
+                                            $stmt->execute();
+                                            $rcount = $stmt->rowCount();
+
+                                            echo '<div class="text-center mt-2">
+                                                <a href="applicants.php?job='.$row['id'].'" class="btn btn-outline-dark">
+                                                View Applicants <span class="badge badge-light ml-1">'.$rcount.'</span>
+                                                </a>                                           
+                                            </div>
                                         </div>
                                     </div>
                                     ';
