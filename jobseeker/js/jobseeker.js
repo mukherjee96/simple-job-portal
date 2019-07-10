@@ -14,7 +14,7 @@ const addSkill = function(e) {
   if (skillInput.value !== "") {
     const div = document.createElement("div");
     div.classList.add("p-1");
-    div.innerHTML = `<a class="btn btn-sm btn-dark" href="#" role="button">${
+    div.innerHTML = `<a class="btn btn-sm btn-primary" href="#" role="button">${
       skillInput.value
     }</a>`;
     skillContainer.appendChild(div);

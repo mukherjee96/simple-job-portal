@@ -107,7 +107,7 @@
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
-                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <div class="dropdown-menu">
@@ -146,7 +146,7 @@
                         </div>
                         <div class="row justify-content-center mt-4">
                             <div class="col-4">
-                                <button type="submit" class="btn btn-block btn-secondary">Register</button>
+                                <button type="submit" class="btn btn-block btn-primary">Register</button>
                             </div>
                         </div>
                     </form>
@@ -167,7 +167,7 @@
         </div>
 
         <!--Footer-->
-        <div id="footer" class="footer bg-dark">
+        <div id="footer" class="footer bg-primary-dark">
             <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
                 <!--Social Links-->
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>

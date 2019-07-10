@@ -258,7 +258,7 @@
                     echo '
                         <div class="btn-group dropleft align-self-end p-2 ml-auto">
                             <!--Profile Link-->
-                            <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <i class="fas fa-user-circle"></i>
                             </button>
                             <div class="dropdown-menu">
@@ -502,7 +502,7 @@
                                 <?php
                                     foreach ($skills as $skill) {
                                         echo '
-                                            <div class="p-1"><a class="btn btn-sm btn-dark" href="#" role="button">'.html_entity_decode($skill['skill']).'</a></div>
+                                            <div class="p-1"><a class="btn btn-sm btn-primary" href="#" role="button">'.html_entity_decode($skill['skill']).'</a></div>
                                         ';
                                     }
                                 ?>
@@ -513,7 +513,7 @@
 
                     <div class="row justify-content-center text-center mt-5">
                         <div class="col-4">
-                            <button type="submit" name="updatebtn" class="btn btn-block btn-secondary mb-3" id="updatebtn">Update Profile</button>
+                            <button type="submit" name="updatebtn" class="btn btn-block btn-primary mb-3" id="updatebtn">Update Profile</button>
                             <a href="#" class="text-danger" data-toggle="modal" data-target="#delete-profile">Delete Profile</a>
                         </div>
                     </div>
@@ -534,7 +534,7 @@
                             Are you sure you want to permanently delete your profile?
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                             <button type="submit" name="deletebtn" class="btn btn-danger">Delete</button>
                         </div>
                     </div>
@@ -544,7 +544,7 @@
         </form>
 
         <!--Footer-->
-        <div id="footer" class="footer bg-dark">
+        <div id="footer" class="footer bg-primary-dark">
             <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
                 <!--Social Links-->
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>

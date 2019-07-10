@@ -144,7 +144,7 @@
             
         <div class="btn-group dropleft align-self-end p-2 ml-auto">
             <!--Profile Link-->
-            <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-user-circle"></i>
             </button>
             <?php
@@ -252,7 +252,7 @@
                                 <?php
                                     foreach ($technologies as $technology) {
                                         echo '
-                                            <div class="p-1"><a class="btn btn-sm btn-dark" href="#" role="button">'.$technology['technology'].'</a></div>
+                                            <div class="p-1"><a class="btn btn-sm btn-primary" href="#" role="button">'.$technology['technology'].'</a></div>
                                         ';
                                     }
                                 ?>
@@ -262,7 +262,7 @@
                     <div class="text-center"><small class="text-muted">Click on a technology to remove</small></div>
                     <div class="row justify-content-center mt-5">
                         <div class="col-sm-3 text-center">
-                            <button type="submit" class="btn btn-block btn-dark mb-3" id="addJobBtn" name="addJobBtn">Apply Changes</button>
+                            <button type="submit" class="btn btn-block btn-primary mb-3" id="addJobBtn" name="addJobBtn">Apply Changes</button>
                             <a href="#" class="text-danger" data-toggle="modal" data-target="#deleteJob">Delete Job</a>
                         </div>
                     </div>
@@ -280,8 +280,8 @@
                                 Are you sure you want to permanently delete this job? 
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                                <button type="submit" id="deleteBtn" name="deleteBtn" class="btn btn-dark">Delete</button>
+                                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                                <button type="submit" id="deleteBtn" name="deleteBtn" class="btn btn-primary">Delete</button>
                             </div>
                             </div>
                         </div>
@@ -293,7 +293,7 @@
     </div>
 
     <!--Footer-->
-    <div id="footer" class="footer bg-dark">
+    <div id="footer" class="footer bg-primary-dark">
         <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
             <!--Social Links-->
             <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>

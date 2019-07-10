@@ -2,10 +2,12 @@
     header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
     
     require "connect.php";
+    require "mail.php";
     session_start();
     $loggedin = false;
     $statement;
     $error;
+    $applied;
 
     if(isset($_SESSION["loggedin"])) {
         if($_SESSION["loggedin"] == true) {
@@ -28,12 +30,22 @@
             if(!$statement->rowCount()) {
                 
                 // Insert a new row if not
-                $statement = $con->prepare("INSERT INTO applications(jobid, jsid, date, status) VALUES(:jobid, '".$_SESSION["id"]."', :date, 'applied')");
+                $statement = $con->prepare("INSERT INTO applications(id, jobid, jsid, date, status) VALUES('".md5(time() . $_SESSION["id"])."',:jobid, '".$_SESSION["id"]."', :date, 'Applied')");
+
                 if(!$statement->execute(array(
                     "jobid" => $_REQUEST["apply"],
                     "date" => date('Y-m-d')
                 ))) { $error = true; } else {
-                    header("Location: jobseeker/my-applications.php?application=successful");
+
+                    $statement = $con->prepare("SELECT j.designation, e.cname FROM jobs j, employer e WHERE j.id = :id AND j.emp_id = e.id");
+                    $statement->execute(array("id" => $_REQUEST["apply"]));
+                    $data = $statement->fetch(PDO::FETCH_ASSOC);
+
+                    $message = '<p class="p-2">Hello '.$_SESSION["name"].'! Your application for the position of
+                    '.$data['designation'].' at '.$data['cname'].' has been successfully
+                    sent. We will notify you when your application is approved.</p>';
+
+                    if(!sendmail($_SESSION["email"], $_SESSION["name"], "Job Application Successful", $message, null, null, "Location: jobseeker/my-applications.php?application=successful")) { $error = true; }
                 }
             } else {
                 header("Location: jobseeker/my-applications.php?application=present");
@@ -158,7 +170,7 @@
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
-                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <?php
@@ -257,7 +269,7 @@
                                 <?php
                                     if($logo == "") {
                                         echo '
-                                            <img src="images\default.png" width="200" height="200" alt="company logo">
+                                            <img src="images\default-logo.png" width="200" height="200" alt="company logo">
                                         ';
                                     } else {
                                         echo '
@@ -275,7 +287,7 @@
                                             <h5 class="card-title">'.$row['title'].'</h5><hr>
                                         ';
                                     ?>
-                                        <div class="d-flex mb-3">
+                                        <div class="d-flex flex-wrap mb-3">
                                                 <?php
                                                     if(!count($skills)) {
                                                         echo '
@@ -292,7 +304,7 @@
                                                         foreach ($skills as $skill) {
                                                             echo '
                                                                 <div class="p-1">
-                                                                    <span class="badge badge-secondary p-1">'.$skill['technology'].'</span>
+                                                                    <span class="badge badge-primary p-1">'.$skill['technology'].'</span>
                                                                 </div>
                                                             ';
                                                         }
@@ -322,7 +334,7 @@
                                             </div>
                                         </div>
                                         
-                                        <button type="button" class="btn btn-sm btn-outline-dark mt-2" data-toggle="modal" data-target="#more'.$counter.'">More Details</button>
+                                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-toggle="modal" data-target="#more'.$counter.'">More Details</button>
                                     </div>
                                 </div>
                             </div>
@@ -358,7 +370,7 @@
                                                 foreach ($skills as $skill) {
                                                     echo '
                                                         <div class="p-1">
-                                                            <span class="badge badge-secondary p-1">'.$skill['technology'].'</span>
+                                                            <span class="badge badge-primary p-1">'.$skill['technology'].'</span>
                                                         </div>
                                                     ';
                                                 }
@@ -388,20 +400,20 @@
                                             <p><small><strong>Description: </strong>'.$row['description'].'</small></p>
                                     </div>
                                     <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>';
+                                    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>';
 
                                     // Check if applied already
                                     if(isset($applied) && $applied) {
                                         echo '
-                                            <button class="btn btn-dark" disabled>Applied</button>
+                                            <button class="btn btn-primary" disabled>Applied</button>
                                         ';
                                     } else if($row['available'] == 'false') {
                                         echo '
-                                            <button class="btn btn-dark" disabled>Unavailable</button>
+                                            <button class="btn btn-primary" disabled>Unavailable</button>
                                         ';
                                     } else {
                                         echo '
-                                            <a href="jobs.php?apply='.$row['id'].'" class="btn btn-dark">Apply</a>
+                                            <a href="jobs.php?apply='.$row['id'].'" class="btn btn-primary">Apply</a>
                                         ';
                                     }
                                     
@@ -490,8 +502,8 @@
                         ?>
                     </div>
                     <div class="modal-footer">
-                        <a href="jobseeker/edit-profile.php" class="btn btn-outline-dark">Edit</a>
-                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                        <a href="jobseeker/edit-profile.php" class="btn btn-outline-primary">Edit</a>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -526,8 +538,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-dark" id="loginbtn" name="loginbtn">Login</button>
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="loginbtn" name="loginbtn">Login</button>
                     </div>
                 </form>
               </div>
@@ -546,19 +558,19 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
-                        <a href="employer/register.php" class="btn btn-secondary btn-lg mr-2">Employer</a>
-                        <a href="jobseeker/register.php" class="btn btn-secondary btn-lg">Job Seeker</a>
+                        <a href="employer/register.php" class="btn btn-primary btn-lg mr-2">Employer</a>
+                        <a href="jobseeker/register.php" class="btn btn-primary btn-lg">Job Seeker</a>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
         </div>
     
         <!--Footer-->
-        <div id="footer" class="footer bg-dark">
+        <div id="footer" class="footer bg-primary-dark">
             <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
                 <!--Social Links-->
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -574,7 +586,7 @@
         <script src="js/nav.js"></script>
         <?php
             if($error) {
-                echo '<script src="../js/error.js"></script>';
+                echo '<script src="js/error.js"></script>';
             }
         ?>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->

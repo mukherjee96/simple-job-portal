@@ -6,7 +6,7 @@
         $statement->execute();
         $result = $statement->fetch(PDO::FETCH_ASSOC);
 
-        if($_POST['username'] == $result['username'] && $_POST['password'] == $result['password']){
+        if($_POST['username'] == $result['username'] && password_verify($_POST['password'], $result['password'])){
             $_SESSION['admin'] = true;
             header('location:index.php');
         }
@@ -51,7 +51,7 @@
                     </div>
                     <div class="row justify-content-center pt-3">
                         <div class="col-5">
-                            <button type="submit" name="loginbtn" class="btn btn-block btn-dark">Submit</button>
+                            <button type="submit" name="loginbtn" class="btn btn-block btn-primary">Submit</button>
                         </div>
                     </div>
                 </form>

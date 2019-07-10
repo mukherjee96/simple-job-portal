@@ -123,7 +123,7 @@
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
-                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <?php
@@ -167,7 +167,7 @@
                 <div class="container">
                     <div class="row justify-content-center mb-5">
                         <div class="col-sm-4">
-                            <button class="btn btn-block btn-secondary"  data-toggle="modal" data-target="#add-a-job">Post a Job</button>
+                            <button class="btn btn-block btn-primary"  data-toggle="modal" data-target="#add-a-job">Post a Job</button>
                         </div>
                     </div>
                 </div>
@@ -274,7 +274,7 @@
                                             $rcount = $stmt->rowCount();
 
                                             echo '<div class="text-center mt-2">
-                                                <a href="applicants.php?job='.$row['id'].'" class="btn btn-outline-dark">
+                                                <a href="applicants.php?job='.$row['id'].'" class="btn btn-outline-primary">
                                                 View Applicants <span class="badge badge-light ml-1">'.$rcount.'</span>
                                                 </a>                                           
                                             </div>
@@ -344,8 +344,8 @@
                         <div class="d-flex flex-wrap skill-border" id="skill-container"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                        <button type="submit" name="addJobBtn" id="addJobBtn" class="btn btn-dark">Add</button>
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                        <button type="submit" name="addJobBtn" id="addJobBtn" class="btn btn-primary">Add</button>
                     </div>
                 </form>
                 </div>
@@ -353,7 +353,7 @@
         </div>
 
          <!--Footer-->
-         <div id="footer" class="footer bg-dark">
+         <div id="footer" class="footer bg-primary-dark">
             <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
                 <!--Social Links-->
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>

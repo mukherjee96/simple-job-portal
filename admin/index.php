@@ -139,14 +139,14 @@
 
                      if($row['verified'] == 'false'){
                         echo '<td class="text-center">
-                           <a href="index.php?grant=true&email='.$row['email'].'" class="btn btn-sm btn-secondary">Grant</a>
+                           <a href="index.php?grant=true&email='.$row['email'].'" class="btn btn-sm btn-primary">Grant</a>
                            <a href="index.php?delete=true&email='.$row['email'].'" class="btn btn-sm btn-danger">Delete</a>
                         </td>';
                      }
                      else
                         {
                            echo '<td class="text-center">
-                              <a href="index.php?revoke=true&email='.$row['email'].'" class="btn btn-sm btn-secondary">Revoke</a>                           
+                              <a href="index.php?revoke=true&email='.$row['email'].'" class="btn btn-sm btn-primary">Revoke</a>                           
                               <a href="index.php?delete=true&email='.$row['email'].'" class="btn btn-sm btn-danger">Delete</a>
                            </td>';
                         }
@@ -235,11 +235,11 @@
       
                            if($row['highlighted'] == 'false') {
                               echo '<td class="text-center">
-                              <a href="index.php?highlight=true&job='.$row['id'].'" class="btn btn-sm btn-secondary">Highlight</a>
+                              <a href="index.php?highlight=true&job='.$row['id'].'" class="btn btn-sm btn-primary">Highlight</a>
                               </td>';
                            } else {
                               echo '<td class="text-center">
-                                 <a href="index.php?highlight=false&job='.$row['id'].'" class="btn btn-sm btn-secondary">Remove</a>
+                                 <a href="index.php?highlight=false&job='.$row['id'].'" class="btn btn-sm btn-primary">Remove</a>
                               </td>';
                                                    
                         echo '</tr>';

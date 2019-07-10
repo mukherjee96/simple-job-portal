@@ -51,7 +51,6 @@
                 $_SESSION["userType"] = "employer";
             }
             $_SESSION["email"] = $email;
-            $_SESSION["email"] = $email;
             header("Location: index.php?loggedin=true");
         } else {
             header("Location: index.php?error=true");
@@ -133,7 +132,7 @@
                                 <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
                                 <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
                                 <li><a href="jobseeker/my-applications.php">Applications</a></li>
-                                <li><a href="jobs.php">BrowseJobs</a></li>
+                                <li><a href="jobs.php">Browse Jobs</a></li>
                                 <li><a href="logout.php">Logout</a></li>
                             ';
                         } else {
@@ -160,15 +159,12 @@
 
         <div class="d-flex align-items-center p-3 bg-grey">
 
-            <!-- Brand Logo -->
-            <!-- <img class="logo" src="images\default-logo.png" width="40" height="40" alt="Logo"> -->
-
             <!-- Brand Name -->
             <h2 class="brand">Job Portal</h2>
             
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
-                <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-user-circle"></i>
                 </button>
                 <?php
@@ -259,7 +255,7 @@
                                 </div>
                                 <div class="row justify-content-center">
                                     <div class="col-sm-3 p-3">
-                                        <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-secondary">Search</button>
+                                        <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-primary">Search</button>
                                     </div>
                                 </div>
                             </form>
@@ -426,8 +422,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-dark" id="loginbtn" name="loginbtn">Login</button>
+                        <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="loginbtn" name="loginbtn">Login</button>
                     </div>
                 </form>
               </div>
@@ -446,12 +442,12 @@
                 </div>
                 <div class="modal-body">
                     <div class="d-flex justify-content-center">
-                        <a href="employer/register.php" class="btn btn-secondary btn-lg mr-2">Employer</a>
-                        <a href="jobseeker/register.php" class="btn btn-secondary btn-lg">Job Seeker</a>
+                        <a href="employer/register.php" class="btn btn-primary btn-lg mr-2">Employer</a>
+                        <a href="jobseeker/register.php" class="btn btn-primary btn-lg">Job Seeker</a>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
@@ -521,8 +517,8 @@
                         ?>
                     </div>
                     <div class="modal-footer">
-                        <a href="jobseeker/edit-profile.php" class="btn btn-outline-dark">Edit</a>
-                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                        <a href="jobseeker/edit-profile.php" class="btn btn-outline-primary">Edit</a>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -589,16 +585,16 @@
                     ?>
                 </div>
                 <div class="modal-footer">
-                    <a href="employer/edit-profile.php" class="btn btn-outline-dark">Edit</a>
-                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                    <a href="employer/edit-profile.php" class="btn btn-outline-primary">Edit</a>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
                 </div>
                 </div>
             </div>
         </div>
     
         <!--Footer-->
-        <div id="footer" class="footer bg-dark">
-            <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
+        <div id="footer" class="footer bg-primary-dark">
+            <div class="d-flex flex-row justify-content-center mt-3">
                 <!--Social Links-->
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
