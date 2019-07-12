@@ -83,7 +83,7 @@
         $error = false;
 
         // Update personal details
-        $sql = "UPDATE jobseeker SET name = :name, email = :email, address = :address, phone = :phone";
+        $sql = "UPDATE jobseeker SET name = :name, email = :email, address = :address, phone = :phone WHERE id = '".$_SESSION['id']."'";
         $statement = $con->prepare($sql);
         if(!$statement->execute(array(
             'name' => $name,
@@ -94,9 +94,9 @@
 
         //Update Experience
         if($fresher == "false") {
-            $sql = "UPDATE jobseeker SET fresher = :fresher, present_company = :present_company, designation = :designation, salary = :$salary, experience = :experience WHERE id = '".$_SESSION['id']."'";
+            $sql = "UPDATE jobseeker SET fresher = :fresher, present_company = :present_company, designation = :designation, salary = :salary, experience = :experience WHERE id = '".$_SESSION['id']."'";
             $statement = $con->prepare($sql);
-            if(!$statement.execute(array(
+            if(!$statement->execute(array(
                 'fresher' => $fresher,
                 'present_company' => $present_company,
                 'designation' => $designation,
@@ -117,7 +117,7 @@
         // Update higher secondary education
         $sql = "UPDATE jstwelveth SET board = :board, stream = :stream, yop = :yop, marks = :marks WHERE jsid = '".$_SESSION['id']."';";
         $statement = $con->prepare($sql);
-        if($statement->execute(array(
+        if(!$statement->execute(array(
             'board' => $hsboard,
             'stream' => $stream,
             'yop' => $hsyop,
@@ -125,11 +125,11 @@
         ))) { $error = true; }
 
         // Update undergraduation details
-        $sql = "UPDATE jsug SET university = :university, dept = :department, yop = :yop marks = :marks WHERE jsid = '".$_SESSION['id']."';";
-        $statement = $con->preapre($sql);
+        $sql = "UPDATE jsug SET university = :university, dept = :department, yop = :yop, marks = :marks WHERE jsid = '".$_SESSION['id']."';";
+        $statement = $con->prepare($sql);
         if(!$statement->execute(array(
             'university' => $university,
-            'dept' => $department,
+            'department' => $department,
             'yop' => $ugyop,
             'marks' => $ugmarks
         ))) { $error = true; }
@@ -139,7 +139,7 @@
         $statement = $con->prepare($sql);
         $statement->execute();
 
-        $sql .= "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', :skill)";
+        $sql = "INSERT INTO jsskills(jsid, skill) VALUES('".$_SESSION["id"]."', :skill)";
         $statement = $con->prepare($sql);
         foreach ($skills as $skill) {
             if(!$statement->execute(array('skill' => $skill))) { $error = true; }
@@ -470,7 +470,7 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="salary">Salary</label>
+                            <label for="salary">Salary (in LPA)</label>
                             <?php
                                 echo'
                                 <input type="number" class="form-control" id="salary" name="salary" value="'.$result["salary"].'"placeholder="Salary">
