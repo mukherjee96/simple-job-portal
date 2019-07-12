@@ -86,10 +86,10 @@
                 <li><a href="../">Home</a></li>
                 <li><a href="#">Privacy Policy</a></li>
                 <li>
-                    <div class="d-flex flex-row justify-content-start bd-highlight mt-3">
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
+                    <div class="d-flex flex-row justify-content-start  mt-3">
+                        <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
+                        <div class="p-2 "><a href="#"><i class="fab fa-twitter"></a></i></div>
+                        <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
                     </div>
                 </li>
             </ul>
@@ -205,11 +205,11 @@
 
         <!--Footer-->
         <div id="footer" class="footer bg-primary-dark">
-            <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
+            <div class="d-flex flex-row justify-content-center  mt-3">
                 <!--Social Links-->
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-twitter"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
             <a href="#">Privacy Policy</a>

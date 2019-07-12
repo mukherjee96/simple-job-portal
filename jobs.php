@@ -1,6 +1,6 @@
 <?php
     header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
-    
+
     require "connect.php";
     require "mail.php";
     session_start();
@@ -28,7 +28,7 @@
             $statement = $con->prepare("SELECT id FROM applications WHERE jsid = '".$_SESSION["id"]."' AND jobid = :jobid");
             $statement->execute(array("jobid" => $_REQUEST["apply"]));
             if(!$statement->rowCount()) {
-                
+
                 // Insert a new row if not
                 $statement = $con->prepare("INSERT INTO applications(id, jobid, jsid, date, status) VALUES('".md5(time() . $_SESSION["id"])."',:jobid, '".$_SESSION["id"]."', :date, 'Applied')");
 
@@ -94,7 +94,7 @@
         $statement = $con->prepare($sql);
         $statement->execute();
     }
-    
+
     $result = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : null;
 
 ?>
@@ -122,7 +122,7 @@
         <!--Sidenav-->
         <nav class="nav">
             <ul>
-            	
+
                 <!--Before Login-->
                 <?php
                     if($loggedin == false) {
@@ -139,7 +139,8 @@
                         if($userType == "jobseeker") {
                             echo '
                                 <li><a href="#" data-toggle="modal" data-target="#profile">Profile</a></li>
-                                <li><a href="jobseeker/edit-profile.php">Edit</a></li>                    
+                                <li><a href="jobseeker/edit-profile.php">Edit</a></li>
+                                <li><a href="jobseeker/my-applications.php">Applications</a></li>
                                 <li><a href="logout.php">Logout</a></li>
                             ';
                         } else {
@@ -155,10 +156,10 @@
                 <!-- Common -->
                 <li><a href="#">Privacy Policy</a></li>
                 <li>
-                    <div class="d-flex flex-row justify-content-start bd-highlight mt-3">
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
-                        <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
+                    <div class="d-flex flex-row justify-content-start  mt-3">
+                        <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
+                        <div class="p-2 "><a href="#"><i class="fab fa-twitter"></a></i></div>
+                        <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
                     </div>
                 </li>
             </ul>
@@ -167,7 +168,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="index.php">Job Portal</a></h2>
-            
+
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
                 <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -182,7 +183,7 @@
                                     <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#profile">Profile</a>
-                                    <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>                    
+                                    <a class="dropdown-item" href="jobseeker/edit-profile.php">Edit</a>
                                     <a class="dropdown-item" href="logout.php">Logout</a>
                                 </div>
                             ';
@@ -193,7 +194,7 @@
                                     <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
                                     <div class="dropdown-divider"></div>
                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#employer-profile">Profile</a>
-                                    <a class="dropdown-item" href="employer/edit-profile.php">Edit</a>                    
+                                    <a class="dropdown-item" href="employer/edit-profile.php">Edit</a>
                                     <a class="dropdown-item" href="logout.php">Logout</a>
                                 </div>
                             ';
@@ -208,7 +209,7 @@
                 ?>
             </div>
         </div>
-          
+
         <!--Page Content-->
         <div class="page-container">
             <div class="content-wrap container-fluid">
@@ -311,7 +312,7 @@
                                                     }
                                                 ?>
                                         </div>
-                                        
+
                                 <?php
                                     echo '
                                         <div class="d-flex mb-3">
@@ -333,7 +334,7 @@
                                                 <p class="card-text"><small><strong>Location: </strong>'.$row['location'].'</small></p>
                                             </div>
                                         </div>
-                                        
+
                                         <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-toggle="modal" data-target="#more'.$counter.'">More Details</button>
                                     </div>
                                 </div>
@@ -351,7 +352,7 @@
                                         </button>
                                     </div>
                                     <div class="modal-body container">
-                                        <div class="d-flex">
+                                        <div class="d-flex flex-wrap">
 
                                         ';
 
@@ -416,8 +417,8 @@
                                             <a href="jobs.php?apply='.$row['id'].'" class="btn btn-primary">Apply</a>
                                         ';
                                     }
-                                    
-                                echo '    
+
+                                echo '
                                     </div>
                                 </div>
                             </div>
@@ -475,23 +476,23 @@
                             }
 
                             echo '
-                                
+
                                 <p><b><i class="fas fa-phone"></i> Phone: </b>'.$mPhone.'</p>
-                                
+
                                 <p><b><i class="fas fa-envelope"></i> Email: </b>'.$row['email'].'</p>
-                                
+
                                 <p><b><i class="fas fa-map-marked-alt"></i> Address: </b>'.$mAddress.'</p>
-                                
+
                                 <p><b><i class="fas fa-briefcase"></i> Fresher: </b>'.$mFresher.'</p>
-                                
+
                                 <p><b><i class="fas fa-building"></i> Present Company: </b>'.$mPresentCompany.'</p>
-                                
+
                                 <p><b><i class="fas fa-user-tag"></i> Designation: </b>'.$mDesignation.'</p>
-                                
+
                                 <p><b><i class="fas fa-money-check-alt"></i> Salary: </b>'.$mSalary.'</p>
-                                
+
                                 <p><b><i class="fas fa-chart-line"></i> Experience: </b>'.$mExperience.'</p>
-                                
+
                             ';
 
                             if($mFile == 'none') {
@@ -568,20 +569,20 @@
                 </div>
             </div>
         </div>
-    
+
         <!--Footer-->
         <div id="footer" class="footer bg-primary-dark">
-            <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
+            <div class="d-flex flex-row justify-content-center  mt-3">
                 <!--Social Links-->
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-twitter"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
             <a href="#">Privacy Policy</a>
             </div>
         </div>
-        
+
         <!-- Optional JavaScript -->
         <script src="js/nav.js"></script>
         <?php

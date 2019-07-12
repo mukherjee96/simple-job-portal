@@ -258,9 +258,9 @@
                                                 <td>
                                                     <div class="d-flex flex-row justify-content-center">
 
-                                                        <a href="applicants.php?job='.$_REQUEST["job"].'&application='.$application["id"].'&mode=approve" class="text-success bg-light p-1"><i class="fas fa-check-circle"></i></a>
+                                                        <a href="applicants.php?job='.$_REQUEST["job"].'&application='.$application["id"].'&mode=approve" class="text-success bg-light p-1" id="approve"><i class="fas fa-check-circle"></i></a>
 
-                                                        <a href="applicants.php?job='.$_REQUEST["job"].'&application='.$application["id"].'&mode=reject" class="text-danger bg-light ml-1 p-1"><i class="fas fa-ban"></i></a>
+                                                        <a href="applicants.php?job='.$_REQUEST["job"].'&application='.$application["id"].'&mode=reject" class="text-danger bg-light ml-1 p-1" id="reject"><i class="fas fa-ban"></i></a>
 
                                                     </div>
                                                 </td>
@@ -287,13 +287,28 @@
             </div>
         </div>
 
+        <!-- Spinner -->
+        <div class="modal" tabindex="-1" role="dialog" id="spinner">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <div class="d-flex align-items-center">
+                            <strong>Processing...</strong>
+                            <div class="spinner-border ml-auto" role="status" aria-hidden="true"></div>
+                        </div>
+                        <div class="text-center p-4"><small>This usually takes a few seconds. Candidate details will be mailed.</small></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!--Footer-->
         <div id="footer" class="footer bg-dark">
-            <div class="d-flex flex-row justify-content-center bd-highlight mt-3">
+            <div class="d-flex flex-row justify-content-center  mt-3">
                 <!--Social Links-->
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-twitter"></a></i></div>
-                <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-twitter"></a></i></div>
+                <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
                 <a href="#">Privacy Policy</a>
@@ -306,10 +321,11 @@
             if($error) {
                 echo "<script src='js/error.js'></script>";
             }
-        ?>
+            ?>
         <!-- jQuery first, then Popper.js, then Bootstrap JS -->
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="js/applicants.js"></script>
     </body>
 </html>
