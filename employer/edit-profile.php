@@ -14,7 +14,7 @@
     }
 
     $file = array('valid' => true, 'error' => '');
-    
+
     // Obtain Profile Details
     $sql = "SELECT cname, rname, sector, formed, pan, type, address, phone, remail, cemail, website, no_of_emp FROM employer WHERE id = '".$_SESSION["id"]."'";
     $statement = $con->prepare($sql);
@@ -128,7 +128,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css" />
-    
+
     <link rel="stylesheet" href="../css/main.css">
 
     <title>Edit Profile</title>
@@ -146,12 +146,12 @@
                 <li><a href="../">Home</a></li>
                 <?php
                     if($loggedin == true) {
-                        echo '                 
+                        echo '
                             <li><a href="../logout.php">Logout</a></li>
                         ';
                     }
                 ?>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -164,7 +164,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-            
+
             <?php
                 if($loggedin == true) {
                     echo '
@@ -176,7 +176,7 @@
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>                
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../logout.php">Logout</a>
                             </div>
                         </div>
@@ -201,7 +201,7 @@
                 <div class="text-center mb-5">
                     <h2>Edit Your Profile</h2>
                 </div>
-                
+
                 <form action="edit-profile.php" method="POST" enctype="multipart/form-data">
                     <h4>Company Details</h4><hr><br>
                     <div class="form-row">
@@ -248,7 +248,7 @@
                             ?>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="logo">Company Logo</label>                    
+                            <label for="logo">Company Logo</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="logo" name="logo">
                                 <label class="custom-file-label" for="logo">Choose file</label>
@@ -353,7 +353,7 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
 

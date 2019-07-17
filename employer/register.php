@@ -2,7 +2,7 @@
     require '../connect.php';
     session_start();
     if(isset($_SESSION["loggedin"])) {
-        if($_SESSION["loggedin"] == true) 
+        if($_SESSION["loggedin"] == true)
             echo "<script>window.location.href='../'</script>";
     } else {
         if(isset($_POST['name'])) {
@@ -18,7 +18,7 @@
             $no_of_emp = $_POST['no_of_emp'];
             $type = $_POST['type'];
             $pan = $_POST['pan'];
-            
+
             // Personal Detail
             $name = $_POST['name'];
             $email = $_POST['email'];
@@ -26,7 +26,7 @@
             $cpass = $_POST['cpassword'];
 
             if($pass == $cpass) {
-                
+
                 $pass = password_hash($pass, PASSWORD_DEFAULT);
                 $sql = "INSERT INTO employer(id, cname, rname, sector, formed, pan, type, address, phone, remail, cemail, website, no_of_emp, password) VALUES (:id, :cname, :rname, :sector, :formed, :pan, :type, :address, :phone, :remail, :cemail, :website, :no_of_emp, '$pass');";
                 $statement = $con->prepare($sql);
@@ -68,7 +68,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css" />
-    
+
     <link rel="stylesheet" href="../css/main.css">
 
     <title>Registration</title>
@@ -84,7 +84,7 @@
             <ul>
             	<!--Before Login-->
                 <li><a href="../">Home</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -98,7 +98,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-            
+
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
                 <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -115,7 +115,7 @@
                 <div class="text-center mb-5">
                     <h2>Register as Employer</h2>
                 </div>
-                
+
                 <form action="#" method="POST">
                     <h4>Company Details</h4><hr><br>
                     <div class="form-row">
@@ -212,7 +212,7 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
 

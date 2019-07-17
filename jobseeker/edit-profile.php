@@ -14,7 +14,7 @@
     }
 
     $file = array('valid' => true, 'error' => '');
-    
+
     // Obtain Personal Details & Experience
     $sql = "SELECT name,email,phone,address,fresher,present_company,designation,salary,experience FROM jobseeker WHERE id = '".$_SESSION["id"]."';";
     $statement = $con->prepare($sql);
@@ -55,7 +55,7 @@
         $sboard = $_POST['sboard'];
         $syop = $_POST["syop"];
         $smarks = $_POST["smarks"];
-        
+
         // Higher Secondary Education
         $hsboard = $_POST['hsboard'];
         $stream = $_POST['stream'];
@@ -189,7 +189,7 @@
                 }
             }
         }
-        
+
         if($error) {
             header("Location: edit-profile.php?error=true");
         } else {
@@ -216,7 +216,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css" />
-    
+
     <link rel="stylesheet" href="../css/main.css">
 
     <title>Edit Profile</title>
@@ -234,12 +234,12 @@
                 <li><a href="../">Home</a></li>
                 <?php
                     if($loggedin == true) {
-                        echo '                 
+                        echo '
                             <li><a href="../logout.php">Logout</a></li>
                         ';
                     }
                 ?>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start bd-highlight mt-3">
                         <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -252,7 +252,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-            
+
             <?php
                 if($loggedin == true) {
                     echo '
@@ -264,7 +264,7 @@
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>                
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../logout.php">Logout</a>
                             </div>
                         </div>
@@ -276,7 +276,7 @@
         <div class="page-container">
 
             <div class="alert alert-danger" role="alert" id="error" style="display: none;">
-                <?php 
+                <?php
                     if($file['valid'] == false) {
                         echo $file['error'];
                     } else {
@@ -334,7 +334,7 @@
                             ?>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="cv">Upload CV</label>                    
+                            <label for="cv">Upload CV</label>
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="cv" name="cv">
                                 <label class="custom-file-label" for="customFile">Choose file</label>
@@ -519,7 +519,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!--Delete Profile Confirmation-->
             <div class="modal fade" id="delete-profile" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
@@ -552,7 +552,7 @@
                 <div class="p-2 bd-highlight"><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-                <a href="#">Privacy Policy</a>
+                <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
 
@@ -564,7 +564,7 @@
         if($checked == "true") {
             echo "<script src='js/fresher.js'></script>";
         }
-            
+
         if($file['valid'] == false || isset($_REQUEST['error'])) {
             echo "<script src='../js/error.js'></script>";
         }

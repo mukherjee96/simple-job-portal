@@ -1,6 +1,6 @@
 <?php
     header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
-    
+
     require "../connect.php";
     session_start();
     $loggedin = false;
@@ -25,7 +25,7 @@
         $stmt = $con->prepare("SELECT emp_id FROM jobs WHERE id = :id");
         $stmt->execute(array('id' => $_REQUEST["job"]));
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
-        
+
         if(!$stmt->rowCount() || $result['emp_id'] != $_SESSION['id'])
             header('location: ../index.php');
         else
@@ -61,7 +61,7 @@
         $salary = $_POST["salary"];
         $experience = $_POST["experience"];
         $location = $_POST["location"];
-        
+
         $technology = json_decode($_POST["skills"]);
 
         $sql = "UPDATE jobs SET title = :title, designation = :designation, description = :description, salary = :salary, experience = :experience, location = :location WHERE id = :id";
@@ -95,7 +95,7 @@
         } else {
             header('Location: manage-jobs.php?edit-success=true');
         }
-        
+
     }
 
 ?>
@@ -127,7 +127,7 @@
         <ul>
           	<li><a href="../">Home</a></li>
             <li><a href="../logout.php">Logout</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="../privacy-policy">Privacy Policy</a></li>
             <li>
                 <div class="d-flex flex-row justify-content-start  mt-3">
                     <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -141,7 +141,7 @@
     <!--Brand logo-->
     <div class="d-flex align-items-center p-3 bg-grey">
         <h2 class="brand"><a href="../">Job Portal</a></h2>
-            
+
         <div class="btn-group dropleft align-self-end p-2 ml-auto">
             <!--Profile Link-->
             <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -153,7 +153,7 @@
                         <div class="dropdown-menu">
                             <!--Options-->
                             <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                            <div class="dropdown-divider"></div>              
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="../logout.php">Logout</a>
                         </div>
                     ';
@@ -206,7 +206,7 @@
                     <div class="form-group">
                         <label for="description">Description</label>
                         <?php
-                            echo'                            
+                            echo'
                                 <textarea class="form-control" id="description" name="description" rows="4" maxlength="1500" required>'.$row["description"].'</textarea>
                             ';
                         ?>
@@ -277,7 +277,7 @@
                                 </button>
                             </div>
                             <div class="modal-body">
-                                Are you sure you want to permanently delete this job? 
+                                Are you sure you want to permanently delete this job?
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
@@ -287,7 +287,7 @@
                         </div>
                     </div>
                 </form>
-            </div>            
+            </div>
 
         </div>
     </div>
@@ -301,7 +301,7 @@
             <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
         </div>
         <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="../privacy-policy">Privacy Policy</a>
         </div>
     </div>
 

@@ -1,10 +1,10 @@
 <?php
      header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
-    
+
      require "../connect.php";
      session_start();
      $loggedin = false;
- 
+
      if(isset($_SESSION["loggedin"])) {
          if($_SESSION["loggedin"] == true) {
              $loggedin = true;
@@ -48,7 +48,7 @@
                 <li><a href="../">Home</a></li>
                 <li><a href="../jobs.php">Browse Jobs</a></li>
                 <li><a href="../logout.php">Logout</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -62,7 +62,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-                
+
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
                 <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -74,7 +74,7 @@
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>              
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../logout.php">Logout</a>
                             </div>
                         ';
@@ -91,7 +91,7 @@
 
         <div class="page-container">
             <div class="content-wrap container-fluid">
-            
+
                 <!-- Messages -->
                 <div class="alert alert-success" role="alert" id="success" style="display: none;">
                     <p>Your application has been sent.</p>
@@ -151,7 +151,7 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
 

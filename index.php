@@ -147,7 +147,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
             ?>
 
             <!-- Common -->
-            <li><a href="#">Privacy Policy</a></li>
+            <li><a href="privacy-policy">Privacy Policy</a></li>
             <li>
                 <div class="d-flex flex-row justify-content-start  mt-3">
                     <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -245,10 +245,10 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                                     <input type="text" class="form-control" id="designation" name="designation" placeholder="Designation">
                                 </div>
                                 <div class="col-md p-2">
-                                    <input type="number" class="form-control" id="salary" name="salary" placeholder="Salary">
+                                    <input type="number" class="form-control" id="salary" name="salary" min="0" placeholder="Salary (in LPA)">
                                 </div>
                                 <div class="col-md p-2">
-                                    <input type="number" class="form-control" id="experience" name="experience" placeholder="Experience">
+                                    <input type="number" class="form-control" id="experience" name="experience" min="0" max ="99" placeholder="Experience">
                                 </div>
                                 <div class="col-md p-2">
                                     <input type="text" class="form-control" id="location" name="location" placeholder="Location">
@@ -602,7 +602,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
             <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
         </div>
         <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="privacy-policy">Privacy Policy</a>
         </div>
     </div>
 

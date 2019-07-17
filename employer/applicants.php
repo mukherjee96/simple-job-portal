@@ -1,12 +1,12 @@
 <?php
      header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
-    
+
      require "../connect.php";
      require "../mail.php";
      session_start();
      $loggedin = false;
      $error = false;
- 
+
      if(isset($_SESSION["loggedin"])) {
          if($_SESSION["loggedin"] == true) {
              $loggedin = true;
@@ -18,18 +18,18 @@
          header("location:../index.php");
      }
 
-     
+
     if(!isset($_REQUEST["job"]))
         header("location:manage-jobs.php");
-     
+
      // $job_id = $_REQUEST["job"];
      $stmt = $con->prepare("SELECT emp_id FROM jobs WHERE id = :id");
      $stmt->execute(array('id' => $_REQUEST["job"]));
      $employer = $stmt->fetch(PDO::FETCH_ASSOC);
-     
+
      if($_SESSION['id'] != $employer["emp_id"])
         header("location:manage-jobs.php");
-     
+
     // Approve or Reject Application
      if(isset($_REQUEST["mode"]) && isset($_REQUEST["application"])) {
         $statement = $con->prepare("SELECT emp_id FROM jobs WHERE id = (SELECT jobid FROM applications WHERE id = :id) AND emp_id = :emp_id");
@@ -63,7 +63,7 @@
                     </p>
                     ';
                     if(!sendmail($data["email"], $data["name"], "Application Approved", $message, null, null, null))  { $email_error = true; }
-                    
+
                     // Employer message
                     $message = '
                     <p class="p-2">Hello Mr./Ms. '.$_SESSION['name'].',<br> this email contains information regarding the application for the designation of '.$data['designation'].' at '.$data['cname'].' that you have approved:</p>
@@ -85,7 +85,7 @@
                             $error = true;
                         }
                     }
-    
+
                 }
             }
             else if($_REQUEST["mode"] == 'reject') {
@@ -156,7 +156,7 @@
                 <li><a href="../">Home</a></li>
                 <li><a href="manage-jobs.php">Manage Jobs</a></li>
                 <li><a href="../logout.php">Logout</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -170,7 +170,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-                
+
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
                 <button type="button" class="btn btn-sm btn-round btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -182,7 +182,7 @@
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>              
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../logout.php">Logout</a>
                             </div>
                         ';
@@ -235,13 +235,13 @@
                                     ))) { $error = true; }
                                     else {
                                         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                                        echo'                        
+                                        echo'
                                             <tr class="text-center h5 font-weight-normal">
                                                 <th scope="row">1</th>
                                                 <td>'.$row["name"].'</td>
                                                 <td>'.$row["university"].'</td>
                                                 <td>'.$row["yop"].'</td> ';
-    
+
                                                 if($row["fresher"] == true) {
                                                     echo '
                                                         <td>'.$row["designation"].' at '.$row["present_company"].'</td>
@@ -274,7 +274,7 @@
                         </tbody>
                     </table>
                 </div>
-                
+
                 <?php
                     if($statement->rowCount() == 0) {
                         echo '
@@ -311,7 +311,7 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-                <a href="#">Privacy Policy</a>
+                <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
 

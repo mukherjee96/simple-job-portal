@@ -56,13 +56,13 @@
     if(isset($_POST["title"])) {
 
         // Search term specific SQL
-        $title = $_POST["title"] == "" ? "%null%" : "%".$_POST["title"]."%";
-        $designation = $_POST["designation"] == "" ? "%null%" : "%".$_POST["designation"]."%";
+        $title = $_POST["title"] == "" ? "%" : "%".$_POST["title"]."%";
+        $designation = $_POST["designation"] == "" ? "%" : "%".$_POST["designation"]."%";
         $salary = $_POST["salary"] == "" ? "0" : $_POST["salary"];
-        $experience = $_POST["experience"] == "" ? "0" : $_POST["experience"];
-        $location = $_POST["location"] == "" ? "%null%" : "%".$_POST["location"]."%";
+        $experience = $_POST["experience"] == "" ? "99" : $_POST["experience"];
+        $location = $_POST["location"] == "" ? "%" : "%".$_POST["location"]."%";
 
-        $sql = "SELECT * FROM jobs WHERE title LIKE :title OR designation LIKE :designation OR salary >= :salary OR experience >= :experience OR location LIKE :location";
+        $sql = "SELECT * FROM jobs WHERE title LIKE :title AND designation LIKE :designation AND salary >= :salary AND experience <= :experience AND location LIKE :location";
 
         $statement = $con->prepare($sql);
         $statement->execute(array(
@@ -154,7 +154,7 @@
                 ?>
 
                 <!-- Common -->
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -579,7 +579,7 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-            <a href="#">Privacy Policy</a>
+            <a href="privacy-policy">Privacy Policy</a>
             </div>
         </div>
 

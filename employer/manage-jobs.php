@@ -1,6 +1,6 @@
 <?php
     header("Content-Security-Policy: script-src 'self' https://code.jquery.com https://cdnjs.cloudflare.com https://stackpath.bootstrapcdn.com");
-    
+
     require "../connect.php";
     session_start();
     $loggedin = false;
@@ -27,7 +27,7 @@
         $experience = $_POST["emp-experience"];
         $location = $_POST["emp-location"];
         $skills = json_decode($_POST['skills']);
-        
+
         $sql = "INSERT INTO jobs(id, emp_id,title,designation,description,salary,experience,location,highlighted,available) VALUES(:id, '$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
 
         $statement = $con->prepare($sql);
@@ -106,7 +106,7 @@
             <ul>
             	<li><a href="../">Home</a></li>
                 <li><a href="../logout.php">Logout</a></li>
-                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="../privacy-policy">Privacy Policy</a></li>
                 <li>
                     <div class="d-flex flex-row justify-content-start  mt-3">
                         <div class="p-2 "><a href="#"><i class="fab fa-facebook"></i></a></div>
@@ -120,7 +120,7 @@
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
             <h2 class="brand"><a href="../">Job Portal</a></h2>
-            
+
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->
                 <button type="button" class="btn btn-sm btn-round dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -132,7 +132,7 @@
                             <div class="dropdown-menu">
                                 <!--Options-->
                                 <a class="dropdown-item disabled" href="#">'.$_SESSION["name"].'</a>
-                                <div class="dropdown-divider"></div>              
+                                <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="../logout.php">Logout</a>
                             </div>
                         ';
@@ -149,7 +149,7 @@
 
         <div class="page-container">
             <div class="content-wrap container-fluid">
-            
+
                 <!-- Messages -->
                 <div class="alert alert-success pb-3" role="alert" id="success" style="display:none;">
                     <p>The job has been posted.</p>
@@ -180,7 +180,7 @@
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-sm-8">
-                        
+
                         <!-- Modified -->
                         <?php
                             $sql = "SELECT id,title,designation,description,salary,experience,location FROM jobs WHERE emp_id='".$_SESSION['id']."'";
@@ -195,7 +195,7 @@
                                         </div>
                                     </div>
                                 ';
-                            }   
+                            }
                             else{
                                 $count = 0;
                                 $rows = $statement->fetchAll();
@@ -205,7 +205,7 @@
                                     $stmt = $con->prepare("SELECT technology FROM jobtech WHERE job_id='".$row["id"]."'");
                                     $stmt->execute();
                                     $tech = $stmt->fetchAll();
-               
+
                                     $tech_list = array();
                                     foreach($tech as $t) {
                                        array_push($tech_list,$t['technology']);
@@ -225,11 +225,11 @@
                                                 if($available['available'] == 'false'){
 
                                                 echo' <div class="p-2 "><a href="manage-jobs.php?available=true&id='.$row['id'].'" class="card-link text-dark" data-toggle="tooltip" data-placement="top" title="Mark as Available"><i class="fas fa-toggle-off"></i></a></div>';
-                                                
-                                                } 
-                                            
+
+                                                }
+
                                                 if($available['available'] == 'true'){
-                                                
+
                                                 echo' <div class="p-2 "><a href="manage-jobs.php?available=false&id='.$row['id'].'" class="card-link text-dark" data-toggle="tooltip" data-placement="top" title="Mark as Unavailable"><i class="fas fa-toggle-on"></i></a></div>';
 
                                                 }
@@ -276,7 +276,7 @@
                                             echo '<div class="text-center mt-2">
                                                 <a href="applicants.php?job='.$row['id'].'" class="btn btn-outline-primary">
                                                 View Applicants <span class="badge badge-info ml-1">'.$rcount.'</span>
-                                                </a>                                           
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
@@ -318,17 +318,17 @@
                             <label for="emp-description">Description</label>
                             <textarea class="form-control" id="emp-description" name="emp-description" rows="4" placeholder="Describe the job in brief" maxlength="1500" required></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="emp-salary">CTC</label>
                             <input type="number" class="form-control" id="emp-salary" name="emp-salary" placeholder="Enter CTC in LPA" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="emp-experience">Experience Required</label>
                             <input type="number" class="form-control" id="emp-experience" name="emp-experience" placeholder="Enter Experience Required in years" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="emp-location">Location</label>
                             <input type="text" class="form-control" id="emp-location" name="emp-location" placeholder="Enter Location (E.g. Mumbai)" required>
@@ -361,10 +361,10 @@
                 <div class="p-2 "><a href="#"><i class="fab fa-linkedin"></a></i></div>
             </div>
             <div class="text-center mt-2">
-                <a href="#">Privacy Policy</a>
+                <a href="../privacy-policy">Privacy Policy</a>
             </div>
         </div>
-        
+
         <!-- Optional JavaScript -->
         <script src="../js/nav.js"></script>
         <?php
@@ -373,13 +373,13 @@
                     echo "<script src='js/job-error.js'></script>";
                 }
             }
-            
+
             if(isset($_REQUEST["success"])) {
                 if($_REQUEST["success"] == true) {
                     echo "<script src='../js/success.js'></script>";
                 }
             }
-            
+
             if(isset($_REQUEST["edit-success"])) {
                 if($_REQUEST["edit-success"] == true) {
                     echo "<script src='../js/edit-success.js'></script>";
