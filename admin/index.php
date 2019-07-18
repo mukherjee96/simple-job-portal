@@ -83,7 +83,6 @@ if (isset($_POST['job-search'])) {
          <div class="navbar-nav">
             <a class="nav-item nav-link" href="index.php?mode=jobseeker">Job Seekers</a>
             <a class="nav-item nav-link" href="index.php?mode=highlighted-job">Highlight Jobs</a>
-            <a class="nav-item nav-link" href="mail-manage.php">Mail Management</a>
             <a class="nav-item nav-link" href="../logout.php">Logout</a>
          </div>
       </div>
