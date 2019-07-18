@@ -408,10 +408,6 @@
                                         echo '
                                             <button class="btn btn-primary" disabled>Applied</button>
                                         ';
-                                    } else if($row['available'] == 'false') {
-                                        echo '
-                                            <button class="btn btn-primary" disabled>Unavailable</button>
-                                        ';
                                     } else {
                                         echo '
                                             <a href="jobs.php?apply='.$row['id'].'" class="btn btn-primary">Apply</a>
