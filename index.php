@@ -324,7 +324,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                                             } else {
                                                 foreach ($highlights as $highlight) {
                                                     echo '
-                                                                <a class="text-dark" href="jobs.php?technology=' . $highlight['designation'] . '"><p class="card-text bg-light my-2 py-2">' . $highlight['designation'] . '</p></a>
+                                                                <a class="text-dark" href="jobs.php?designation=' . $highlight['designation'] . '"><p class="card-text bg-light my-2 py-2">' . $highlight['designation'] . '</p></a>
                                                             ';
                                                 }
                                             }

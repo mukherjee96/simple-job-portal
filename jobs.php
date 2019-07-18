@@ -81,9 +81,8 @@
         $statement->execute(array('designation' => $designation));
 
     } else if(isset($_REQUEST["technology"])) {
-
         $technology = "%".$_REQUEST["technology"]."%";
-        $sql = "SELECT * FROM jobs WHERE id IN (SELECT job_id FROM jobtech WHERE technology LIKE :technology AND available = 'true')";
+        $sql = "SELECT * FROM jobs WHERE available = 'true' AND id IN (SELECT job_id FROM jobtech WHERE technology LIKE :technology)";
         $statement = $con->prepare($sql);
         $statement->execute(array('technology' => $technology));
 
