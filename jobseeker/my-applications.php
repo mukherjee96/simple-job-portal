@@ -4,6 +4,7 @@
      require "../connect.php";
      session_start();
      $loggedin = false;
+     $noApplication = false;
 
      if(isset($_SESSION["loggedin"])) {
          if($_SESSION["loggedin"] == true) {
@@ -21,6 +22,8 @@
      $statement = $con->prepare($sql);
      $statement->execute();
      $data = $statement->fetchAll(PDO::FETCH_ASSOC);
+     if(!$statement->rowCount())
+        $noApplication = true;
 ?>
 
 <!DOCTYPE html>
@@ -136,6 +139,15 @@
                                 ?>
                             </tbody>
                         </table>
+
+                        <?php
+                            if($noApplication) {
+                                echo '
+                                    <p class="text-center">No applications found.</p>
+                                ';
+                            }
+                        ?>
+
                     </div>
                 </div>
 

@@ -62,7 +62,7 @@
         $experience = $_POST["experience"] == "" ? "99" : $_POST["experience"];
         $location = $_POST["location"] == "" ? "%" : "%".$_POST["location"]."%";
 
-        $sql = "SELECT * FROM jobs WHERE title LIKE :title AND designation LIKE :designation AND salary >= :salary AND experience <= :experience AND location LIKE :location";
+        $sql = "SELECT * FROM jobs WHERE title LIKE :title AND designation LIKE :designation AND salary >= :salary AND experience <= :experience AND location LIKE :location AND available = 'true'";
 
         $statement = $con->prepare($sql);
         $statement->execute(array(
@@ -76,21 +76,21 @@
     } else if(isset($_REQUEST["designation"])) {
 
         $designation = "%".$_REQUEST["designation"]."%";
-        $sql = "SELECT * FROM jobs WHERE designation LIKE :designation";
+        $sql = "SELECT * FROM jobs WHERE designation LIKE :designation AND available = 'true'";
         $statement = $con->prepare($sql);
         $statement->execute(array('designation' => $designation));
 
     } else if(isset($_REQUEST["technology"])) {
 
         $technology = "%".$_REQUEST["technology"]."%";
-        $sql = "SELECT * FROM jobs WHERE id IN (SELECT job_id FROM jobtech WHERE technology LIKE :technology)";
+        $sql = "SELECT * FROM jobs WHERE id IN (SELECT job_id FROM jobtech WHERE technology LIKE :technology AND available = 'true')";
         $statement = $con->prepare($sql);
         $statement->execute(array('technology' => $technology));
 
     } else {
 
         // Default SQL
-        $sql = "SELECT * FROM jobs";
+        $sql = "SELECT * FROM jobs WHERE available = 'true'";
         $statement = $con->prepare($sql);
         $statement->execute();
     }
