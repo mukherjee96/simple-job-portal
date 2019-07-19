@@ -321,7 +321,7 @@ if (isset($_REQUEST["available"])) {
 
                         <div class="form-group">
                             <label for="emp-experience">Experience Required</label>
-                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" min=0 max=99 placeholder="Enter Experience Required in years" required>
+                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" min="0" max="99" placeholder="Enter Experience Required in years" required>
                         </div>
 
                         <div class="form-group">
