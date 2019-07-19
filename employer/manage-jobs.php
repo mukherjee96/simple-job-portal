@@ -20,6 +20,7 @@ if (isset($_POST['emp-title'])) {
     $error = false;
 
     $id = $_SESSION["id"];
+    $job_id = substr(md5(time() . $id), 0, 6);
     $title = $_POST["emp-title"];
     $designation = $_POST["emp-designation"];
     $description = $_POST["emp-description"];
@@ -28,11 +29,11 @@ if (isset($_POST['emp-title'])) {
     $location = $_POST["emp-location"];
     $skills = json_decode($_POST['skills']);
 
-    $sql = "INSERT INTO jobs(id, emp_id,title,designation,description,salary,experience,location,highlighted,available) VALUES(:id, '$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
+    $sql = "INSERT INTO jobs(id, emp_id, title, designation, description, salary, experience, location,highlighted,available) VALUES(:id, '$id', :title, :designation, :description, :salary, :experience, :location, 'false','true')";
 
     $statement = $con->prepare($sql);
     if (!$statement->execute(array(
-        'id' => md5(time() . $id),
+        'id' => $job_id,
         'title' => $title,
         'designation' => $designation,
         'description' => $description,
@@ -42,12 +43,6 @@ if (isset($_POST['emp-title'])) {
     ))) {
         $error = true;
     }
-
-    $statement = $con->prepare("SELECT id FROM jobs WHERE emp_id = '" . $_SESSION["id"] . "';");
-    $statement->execute();
-    $row = $statement->fetchAll();
-
-    $job_id = end($row)["id"];
 
     $statement = $con->prepare("INSERT INTO jobtech(job_id, technology) VALUES('$job_id', :technology);");
     foreach ($skills as $skill) {
@@ -326,7 +321,7 @@ if (isset($_REQUEST["available"])) {
 
                         <div class="form-group">
                             <label for="emp-experience">Experience Required</label>
-                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" min=0 max=99 placeholder="Enter Experience Required in years" required>
+                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" min="0" max="99" placeholder="Enter Experience Required in years" required>
                         </div>
 
                         <div class="form-group">
