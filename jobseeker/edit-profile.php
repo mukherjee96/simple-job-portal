@@ -210,9 +210,10 @@ if (isset($_POST["name"])) {
 }
 
 if (isset($_POST["deletebtn"])) {
-    $sql = "DELETE FROM jobseeker WHERE id = " . $_SESSION['id'] . ";";
+    $sql = "DELETE FROM jobseeker WHERE id = '" . $_SESSION['id'] . "'; DELETE FROM jsskills WHERE jsid = '" . $_SESSION['id'] . "'; DELETE FROM jstenth WHERE jsid = '" . $_SESSION['id'] . "'; DELETE FROM jstwelveth WHERE jsid = '" . $_SESSION['id'] . "'; DELETE FROM jsug WHERE jsid = '" . $_SESSION['id'] . "'; DELETE FROM applications WHERE jsid = '" . $_SESSION['id'] . "';";
     $statement = $con->prepare($sql);
     $statement->execute();
+    header("Location: ../logout.php");
 }
 
 ?>
@@ -381,7 +382,7 @@ if (isset($_POST["deletebtn"])) {
                         <label for="smarks">Marks Obtained (%)</label>
                         <?php
                         echo '
-                                    <input type="nubmer" class="form-control" id="smarks" name="smarks" placeholder="Marks Obtained" value="' . $secondary["marks"] . '" required>
+                                    <input type="number" class="form-control" id="smarks" name="smarks" placeholder="Marks Obtained" value="' . $secondary["marks"] . '" required>
                                 ';
                         ?>
                     </div>
@@ -455,7 +456,7 @@ if (isset($_POST["deletebtn"])) {
                         <label for="ugmarks">CGPA</label>
                         <?php
                         echo '
-                                    <input type="nubmer" class="form-control" id="ugmarks" name="ugmarks" placeholder="CGPA" value="' . $ug["marks"] . '" required>
+                                    <input type="number" class="form-control" id="ugmarks" name="ugmarks" placeholder="CGPA" value="' . $ug["marks"] . '" required>
                                 ';
                         ?>
                     </div>
