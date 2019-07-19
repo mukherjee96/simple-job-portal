@@ -329,7 +329,7 @@
                             <label for="phone">Phone Number</label>
                             <?php
                                 echo'
-                                    <input type="number" class="form-control" id="phone" name="phone" placeholder="Phone Number" value="'.$result["phone"].'" required>
+                                    <input type="number" class="form-control" id="phone" name="phone" placeholder="Phone Number" min=0 max=9999999999 value="'.$result["phone"].'" required>
                                 ';
                             ?>
                         </div>

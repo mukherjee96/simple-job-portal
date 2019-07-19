@@ -316,12 +316,12 @@ if (isset($_REQUEST["available"])) {
 
                         <div class="form-group">
                             <label for="emp-salary">CTC</label>
-                            <input type="number" class="form-control" id="emp-salary" name="emp-salary" placeholder="Enter CTC in LPA" required>
+                            <input type="number" class="form-control" id="emp-salary" name="emp-salary" min=0 placeholder="Enter CTC in LPA" required>
                         </div>
 
                         <div class="form-group">
                             <label for="emp-experience">Experience Required</label>
-                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" placeholder="Enter Experience Required in years" required>
+                            <input type="number" class="form-control" id="emp-experience" name="emp-experience" min=0 max=99 placeholder="Enter Experience Required in years" required>
                         </div>
 
                         <div class="form-group">
