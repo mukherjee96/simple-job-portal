@@ -69,7 +69,7 @@ if (isset($_POST["name"])) {
     $ugmarks = $_POST["ugmarks"];
 
     // Experience
-    $fresher = isset($_POST["fresher"]) == true ? "true" : "false";
+    $fresher = isset($_POST["fresher"]) == "fresher" ? "true" : "false";
     if ($fresher == "false") {
         $present_company = $_POST['present_company'];
         $designation = $_POST['designation'];
@@ -83,23 +83,23 @@ if (isset($_POST["name"])) {
     $error = false;
 
     // Update personal details
-    $sql = "UPDATE jobseeker SET name = :name, email = :email, address = :address, phone = :phone WHERE id = '" . $_SESSION['id'] . "'";
+    $sql = "UPDATE jobseeker SET name = :name, email = :email, address = :address, phone = :phone, fresher = :fresher WHERE id = '" . $_SESSION['id'] . "'";
     $statement = $con->prepare($sql);
     if (!$statement->execute(array(
         'name' => $name,
         'email' => $email,
         'address' => $address,
-        'phone' => $phone
+        'phone' => $phone,
+        'fresher' => $fresher
     ))) {
         $error = true;
     }
 
     //Update Experience
     if ($fresher == "false") {
-        $sql = "UPDATE jobseeker SET fresher = :fresher, present_company = :present_company, designation = :designation, salary = :salary, experience = :experience WHERE id = '" . $_SESSION['id'] . "'";
+        $sql = "UPDATE jobseeker SET present_company = :present_company, designation = :designation, salary = :salary, experience = :experience WHERE id = '" . $_SESSION['id'] . "'";
         $statement = $con->prepare($sql);
         if (!$statement->execute(array(
-            'fresher' => $fresher,
             'present_company' => $present_company,
             'designation' => $designation,
             'salary' => $salary,
@@ -464,7 +464,7 @@ if (isset($_POST["deletebtn"])) {
                 <h4 class="mt-4">Experience</h4>
                 <hr>
                 <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="fresher" name="fresher">
+                    <input type="checkbox" class="custom-control-input" id="fresher" name="fresher" value="fresher">
                     <label class="custom-control-label" for="fresher">I am a fresher</label>
                 </div><br>
                 <div class="form-row">
