@@ -248,7 +248,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                                     <input type="number" class="form-control" id="salary" name="salary" min="0" placeholder="Salary (in LPA)">
                                 </div>
                                 <div class="col-md p-2">
-                                    <input type="number" class="form-control" id="experience" name="experience" min="0" max ="99" placeholder="Experience">
+                                    <input type="number" class="form-control" id="experience" name="experience" min="0" max="99" placeholder="Experience">
                                 </div>
                                 <div class="col-md p-2">
                                     <input type="text" class="form-control" id="location" name="location" placeholder="Location">
