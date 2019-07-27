@@ -243,21 +243,31 @@ if (!$statement->execute(array('job_id' => $_REQUEST["job"]))) {
                                         echo '
                                             <tr class="text-center h5 font-weight-normal">
                                                 <th scope="row">1</th>
-                                                <td>' . $row["name"] . '</td>
+                                                <td>' . $row["name"] . '</td>';
+
+                                        if ($row["university"] != null && $row["yop"] != null) {
+                                            echo '
                                                 <td>' . $row["university"] . '</td>
                                                 <td>' . $row["yop"] . '</td> ';
-
-                                        if ($row["fresher"] == true) {
-                                            echo '
-                                                        <td>' . $row["designation"] . ' at ' . $row["present_company"] . '</td>
-                                                        <td>' . $row["salary"] . '</td>
-                                                        ';
                                         } else {
                                             echo '
-                                                        <td>N/A</td>
-                                                        <td>N/A</td>
-                                                    ';
+                                                <td>N/A</td>
+                                                <td>N/A</td>
+                                            ';
                                         }
+
+                                        if ($row["fresher"] == true && $row["designation"] != null && $row["present_company"] != null) {
+                                            echo '
+                                                <td>' . $row["designation"] . ' at ' . $row["present_company"] . '</td>
+                                                <td>' . $row["salary"] . '</td>
+                                            ';
+                                        } else {
+                                            echo '
+                                                <td>N/A</td>
+                                                <td>N/A</td>
+                                            ';
+                                        }
+
                                         echo ' <td><a target="_blank" href="../uploads/cv/' . $row["cv"] . '"><i class="fas fa-file-download text-dark "></i></a></td>
                                                 <td>
                                                     <div class="d-flex flex-row justify-content-center">
