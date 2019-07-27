@@ -161,7 +161,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
     <div class="d-flex align-items-center p-3 bg-grey">
 
         <!-- Brand Name -->
-        <h2 class="brand">Job Portal</h2>
+        <h2 class="brand">S S Consulting Services LLP</h2>
 
         <div class="btn-group dropleft align-self-end p-2 ml-auto">
             <!--Profile Link-->

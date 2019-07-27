@@ -166,7 +166,7 @@
 
         <!--Brand logo-->
         <div class="d-flex align-items-center p-3 bg-grey">
-            <h2 class="brand"><a href="index.php">Job Portal</a></h2>
+            <h2 class="brand"><a href="index.php">S S Consulting Services LLP</a></h2>
 
             <div class="btn-group dropleft align-self-end p-2 ml-auto">
                 <!--Profile Link-->

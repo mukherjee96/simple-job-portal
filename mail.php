@@ -47,7 +47,7 @@ function sendmail($address, $recipient_name, $subject, $message, $file_loc, $fil
 	  </head>
 	  <body>
 		<div>
-		  <h4 class="bg-info text-white p-1">Job Portal Alerts</h4>
+		  <h4 class="bg-info text-white p-1">S S Consulting Services LLP Alerts</h4>
 		  ' . $message . '
 		  <hr />
 		</div>
