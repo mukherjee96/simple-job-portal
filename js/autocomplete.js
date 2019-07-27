@@ -121,6 +121,8 @@ const cities = [
   'Kolkata',
   'Lucknow',
   'Mumbai',
+  'National Capital Region (NCR)',
+  'New Delhi',
   'Panaji',
   'Patna',
   'Raipur',

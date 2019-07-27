@@ -96,6 +96,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="description" content="Welcome to S S Consulting Services LLP Job Portal" />
 
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/loader.css">
@@ -255,7 +256,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                                     <input type="text" class="form-control" id="location" name="location" placeholder="Location">
                                 </div>
                             </div>
-                            <div class="row justify-content-center">
+                            <div class="row justify-content-center pt-2">
                                 <div class="col-sm-3 p-3">
                                     <button id="search-btn" type="submit" name="search-btn" class="btn btn btn-block btn-primary">Search</button>
                                 </div>
@@ -674,10 +675,13 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
         }
     }
     ?>
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous" async></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous" async></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous" async></script>
+
+    <!-- Loader -->
     <script src="js/loader.js"></script>
 </body>
 
