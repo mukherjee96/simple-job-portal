@@ -237,7 +237,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                     <!-- Search -->
                     <div id="search" class="bg-light mb-4 p-5">
                         <h1 class="text-center">Search Jobs</h1>
-                        <form action="jobs.php" method="POST" class="mt-5" id="searchForm">
+                        <form action="jobs.php" method="POST" class="mt-5" id="searchForm" autocomplete="off">
                             <div class="row justify-content-center mb-3">
                                 <div class="col-md p-2">
                                     <input type="text" class="form-control" id="title" name="title" placeholder="Job Title">
@@ -642,6 +642,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
 
     <!-- Optional JavaScript -->
     <script src="js/nav.js"></script>
+    <script src="js/autocomplete.js"></script>
     <?php
     if (isset($_REQUEST["account_created"])) {
         if ($_REQUEST["account_created"] == true) {
