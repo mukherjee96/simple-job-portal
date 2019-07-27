@@ -298,7 +298,7 @@ if (isset($_REQUEST["available"])) {
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" action="#" id="jobAddForm">
+                    <form method="POST" action="#" id="jobAddForm" autocomplete="off">
                         <div class="form-group">
                             <label for="emp-title">Title</label>
                             <textarea class="form-control" id="emp-title" name="emp-title" rows="2" placeholder="Job Title (E.g. Urgent Requirement for Project Manager)" maxlength="200" required></textarea>
@@ -311,7 +311,7 @@ if (isset($_REQUEST["available"])) {
 
                         <div class="form-group">
                             <label for="emp-description">Description</label>
-                            <textarea class="form-control" id="emp-description" name="emp-description" rows="4" placeholder="Describe the job in brief" maxlength="1500" required></textarea>
+                            <textarea class="form-control" id="description" name="emp-description" rows="4" placeholder="Describe the job in brief" maxlength="1500" required></textarea>
                         </div>
 
                         <div class="form-group">
@@ -326,7 +326,7 @@ if (isset($_REQUEST["available"])) {
 
                         <div class="form-group">
                             <label for="emp-location">Location</label>
-                            <input type="text" class="form-control" id="emp-location" name="emp-location" placeholder="Enter Location (E.g. Mumbai)" required>
+                            <input type="text" class="form-control" id="location" name="emp-location" placeholder="Enter Location (E.g. Mumbai)" required>
                         </div>
 
                         <label for="skill-input">Skills Required</label>
@@ -362,6 +362,7 @@ if (isset($_REQUEST["available"])) {
 
     <!-- Optional JavaScript -->
     <script src="../js/nav.js"></script>
+    <!-- <script src="../js/autocomplete.js"></script> -->
     <?php
     if (isset($_REQUEST["failed"])) {
         if ($_REQUEST["failed"] == true) {
