@@ -98,11 +98,12 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/loader.css">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.css" />
     <link rel="stylesheet" href="css/main.css">
-    <title>Job Portal | Home</title>
+    <title>S S Consulting Services LLP | Home</title>
 </head>
 
 <body>
@@ -387,7 +388,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
                     <!-- About Us -->
                     <div id="about" class="bg-light p-5">
                         <h1 class="text-center">About Us</h1>
-                        <p class="text-center mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque et consequat mi, non sagittis tortor. Donec posuere eros eu ornare finibus. Morbi aliquet dignissim cursus. Donec ultricies nibh blandit, volutpat dui eu, lacinia ante. Aenean fermentum vulputate lacus. Duis efficitur commodo tincidunt. Pellentesque eget enim at lorem interdum bibendum finibus id ante. Proin nec eros sem. Integer interdum vulputate leo, a fermentum tellus scelerisque sed. Sed lobortis est nunc, non consequat magna ornare sed. Sed mi ex, vehicula in ante sit amet, vestibulum suscipit risus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Donec ut dui mollis, faucibus ante id, pellentesque ante.</p>
+                        <p class="text-center mt-3">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque et consequat mi, non sagittis tortor. Donec posuere eros eu ornare finibus. Morbi aliquet dignissim cursus. Donec ultricies nibh blandit, volutpat dui eu, lacinia ante. Aenean fermentum vulputate lacus. Duis efficitur commodo tincidunt. Pellentesque eget enim at lorem interdum bibendum finibus id ante.</p>
                     </div>
                 </div>
             </div>
@@ -593,6 +594,39 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
         </div>
     </div>
 
+    <!-- BAR Loader Modal -->
+    <!-- <div class="modal fade" id="loader" role="dialog" aria-labelledby="loader" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 75%">75%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <!-- SPINNER Loader Modal -->
+    <div class="modal fade loader-bg" id="loader" role="dialog" aria-labelledby="loader" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered text-center" role="document">
+            <div class="lds-spinner" style="width:100%;height:100%">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
     <!--Footer-->
     <div id="footer" class="footer bg-primary-dark">
         <div class="d-flex flex-row justify-content-center mt-3">
@@ -643,6 +677,7 @@ $bpos = $statement->rowCount() > 0 ? $statement->fetchAll(PDO::FETCH_ASSOC) : nu
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="js/loader.js"></script>
 </body>
 
 </html>
